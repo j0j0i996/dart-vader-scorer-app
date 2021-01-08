@@ -3,7 +3,7 @@ const fontFamily = 'Roboto'
 export const header1 = {
     fontWeight: "bold",
     fontFamily: fontFamily,
-    fontSize: 46
+    fontSize: 60
 };
 
 export const header2 = {
@@ -21,6 +21,6 @@ export const header3 = {
 
 export const text = {
     fontFamily: fontFamily,
-    fontSize: 20
+    fontSize: 18
 };
 

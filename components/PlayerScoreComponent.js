@@ -69,15 +69,15 @@ function RemainingView(props) {
 function StatsView(props) {
 
   const renderItem = ({ item }) => (
-    <View style={styles.scoreBoardItem}>
-        <Text style={styles.scoreBoardText}>{item.k}: {item.v} </Text>
+    <View style={styles.statsItem}>
+        <Text style={styles.statsText}>{item.k}: {item.v} </Text>
     </View>
   );
 
   return (
-    <View style={styles.scoreBoardList}>
+    <View>
       <FlatList
-        horizontal={true}s
+        horizontal={false}
         data={props.stats}
         renderItem={renderItem}
         />
@@ -106,34 +106,50 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderColor: colors.gray,
   },
+  scoreBoardList: {
+    flex:1,
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
+    //justifyContent: 'space-around',
+  },
   scoreBoardItem: {
     flex:1,
     paddingLeft: 10,
     paddingRight: 10,
     margin: 5,
-    backgroundColor: colors.primary,
     borderRadius: 15,
-  },
-  scoreBoardList: {
-    flex:1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    //justifyContent: '',
+    backgroundColor: colors.primary,
   },
   scoreBoardText: {
     flex: 1,
     ...Typography.text,
     color: colors.white,
   },
+  statsItem: {
+    //alignSelf: 'center',
+    flex:1,
+    paddingLeft: 10,
+    paddingRight: 10,
+    margin: 5,
+    borderTopWidth: 0.5,
+    borderColor: colors.gray,
+  },
+  statsText: {
+    flex: 1,
+    ...Typography.text,
+    color: colors.gray,
+
+  },
   header1: {
     flex: 1,
     ...Typography.header1,
-    color: colors.text1,
+    color: colors.gray,
   },
   header3: {
     flex: 1,
     ...Typography.header3,
-    color: colors.text1,
+    color: colors.gray,
     //flexWrap: 'wrap',
   },
   turnMarker: {

@@ -1,21 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { View, SafeAreaView, Platform, StyleSheet, StatusBar} from 'react-native';
+import { Typography} from './styles';
+import  colors from  './config/colors'
+import InGameScreen from './screens/InGameScreen';
 
 export default function App() {
+  console.log("App executed")
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <InGameScreen />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: colors.background1,
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0
   },
 });
+

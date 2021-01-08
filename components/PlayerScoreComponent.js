@@ -53,6 +53,8 @@ function ScoreBoardView(props) {
         horizontal={true}
         data={props.scoreBoard}
         renderItem={renderItem}
+        keyExtractor={(item) => item.k}
+        listKey={'11'}
         />
     </View>
   )
@@ -80,6 +82,8 @@ function StatsView(props) {
         horizontal={false}
         data={props.stats}
         renderItem={renderItem}
+        keyExtractor={(item) => item.k}
+        listKey={'12'}
         />
     </View>
   )
@@ -122,12 +126,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   scoreBoardText: {
-    flex: 1,
     ...Typography.text,
     color: colors.white,
   },
   statsItem: {
-    //alignSelf: 'center',
     flex:1,
     paddingLeft: 10,
     paddingRight: 10,
@@ -136,21 +138,16 @@ const styles = StyleSheet.create({
     borderColor: colors.gray,
   },
   statsText: {
-    flex: 1,
     ...Typography.text,
     color: colors.gray,
-
   },
   header1: {
-    flex: 1,
     ...Typography.header1,
     color: colors.gray,
   },
   header3: {
-    flex: 1,
     ...Typography.header3,
     color: colors.gray,
-    //flexWrap: 'wrap',
   },
   turnMarker: {
     left: '0%',

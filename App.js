@@ -5,7 +5,6 @@ import  colors from  './config/colors'
 import InGameScreen from './screens/InGameScreen';
 
 export default function App() {
-  console.log("App executed")
 
   return (
     <SafeAreaView style={styles.container}>

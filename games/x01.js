@@ -89,11 +89,12 @@ class Player {
   }
 }
 
-class Match {
-  constructor(playerArray, startscore, sets4win, legs4set, doubleOut) {
+module.exports = class gameObj {
+  constructor(playerArray, params) {
+    // params = startscore, sets4win, legs4set, doubleOut
     var players = [];
     playerArray.forEach(function (item, index) {
-      let p = new Player(item.name, startscore);
+      let p = new Player(item.name, params.startscore);
       players.push(p);
     });
 
@@ -103,15 +104,14 @@ class Match {
     this.lastLegStarter = 0;
     this.lastSetStarter = 0;
     this.num_throw = 0;
-    this.startscore = startscore;
-    this.sets4win = sets4win;
-    this.legs4set = legs4set;
-    this.doubleOut = doubleOut;
+    this.startscore = params.startscore;
+    this.sets4win = params.sets4win;
+    this.legs4set = params.legs4set;
+    this.doubleOut = params.doubleOut;
     this.back_up = false; // in case of change operation
   }
 
   onThrow(score, multiplicator) {
-    this.num_throw += 1;
     this.players[this.selPlayer].thrown_in_turn = true;
     //testing
     console.log("Dart " + this.num_throw);
@@ -131,6 +131,7 @@ class Match {
         this.onOverthrow();
       }
     }
+    this.num_throw += 1;
   }
 
   onNextPlayer() {
@@ -203,7 +204,7 @@ class Match {
     console.log("Overthrown");
     this.players[this.selPlayer].onOverthrow();
   }
-}
+};
 
 if (require.main === module) {
   const playerArray = [

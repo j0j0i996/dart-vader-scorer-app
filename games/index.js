@@ -1,49 +1,60 @@
-var GameCls = require("./x01");
+import axios from "axios";
+import gameCls from "./x01.js";
+import { EventRegister } from "react-native-event-listeners";
 
 var gameObj;
-
+/*
 function gameHandler(gameInitObj) {
   initialization(gameInitObj);
   gameExec();
 }
+*/
 
-function initialization(gameInitObj) {
+export function initialization(gameInitObj) {
   if (gameInitObj.gameType == "x01") {
-    var GameCls = require("./x01");
-    gameObj = new GameCls(gameInitObj.playerArray, gameInitObj.params);
+    gameObj = new gameCls(gameInitObj.playerArray, gameInitObj.params);
   }
 }
 
-function gameExec() {
-  // API interface
-  const readline = require("readline");
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
+export const gameHandler = async () => {
+  //BUILD API INTERFACE
+  var data = await waitThrow();
+  //var nextPlayer = false;
+  //var score = 20;
+  //var multiplicator = 1;
+
+  if (nextPlayer) {
+    gameObj.onNextPlayer();
+    DeviceEventEmitter.emit("DartEvent", "Next player");
+  } else {
+    gameObj.onThrow(score, multiplicator);
+    DeviceEventEmitter.emit("DartEvent", "Throw");
+  }
+  //return result to app
+};
+
+export const waitThrow = async () => {
+  const url = `http://0.0.0.0:8090/`;
+  var response = await axios.get(url).then((response) => {
+    return response;
   });
-  var score;
-  rl.question("Score: ", function (score) {
-    score = parseInt(score);
-    var multiplicator = 2;
-    var nextPlayer = false;
+  console.log(response.data);
+  return response.data;
+};
 
-    // handle response
-    if (nextPlayer) {
-      gameObj.onNextPlayer();
-    } else {
-      gameObj.onThrow(score, multiplicator);
-    }
+export function get_gameState() {
+  return gameObj.get_gameState();
+}
 
-    console.log(gameObj.players[gameObj.selPlayer]);
-
-    //return result to app
-
-    //run again
-    gameExec();
-  });
+export function get_throwState() {
+  return gameObj.get_throwState();
 }
 
 if (require.main === module) {
+  var test = waitThrow();
+  console.log(test);
+
+  /*
   const playerArray = [
     { id: "1", name: "Jonathan" },
     { id: "2", name: "Sophie" },
@@ -56,4 +67,5 @@ if (require.main === module) {
     params: params,
   };
   gameHandler(gameInitObj);
+  */
 }

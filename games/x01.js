@@ -1,6 +1,7 @@
 class Player {
-  constructor(name, startscore) {
+  constructor(name, id, startscore) {
     this.name = name;
+    this.id = id;
     this.startscore = startscore;
     this.remaining = this.startscore;
     this.sets = 0;
@@ -10,7 +11,7 @@ class Player {
     this.darts_thrown_total = 0;
     this.points_thrown_total = 0;
     this.avg = 0;
-    this.last_throws = [0, 0, 0];
+    this.last_throws = [false, false, false];
     this.thrown_in_turn = false;
     this.active = false;
   }
@@ -28,6 +29,24 @@ class Player {
     console.log("Darts thrown: " + this.darts_thrown_leg);
     console.log("Points total: " + this.points_thrown_total);
     console.log("Avg: " + this.avg);
+  }
+
+  get_playerState() {
+    return {
+      name: this.name,
+      id: this.id,
+      remaining: this.remaining,
+      active: this.active,
+      scoreBoard: [
+        { k: "Sets", v: this.sets },
+        { k: "Legs", v: this.legs },
+      ],
+      stats: [
+        { k: "Last score", v: this.last_score },
+        { k: "Darts thrown", v: this.darts_thrown_leg },
+        { k: "Average", v: this.avg },
+      ],
+    };
   }
 
   onThrow(score, num_throw) {
@@ -65,7 +84,7 @@ class Player {
     this.darts_thrown_leg++;
     this.darts_thrown_total++;
     this.avg = (this.points_thrown_total / this.darts_thrown_total) * 3;
-    this.last_throws = [0, 0, 0];
+    this.last_throws = [false, false, false];
   }
 
   onNextLeg() {
@@ -74,7 +93,7 @@ class Player {
   }
 
   onTurnStart() {
-    this.last_throws = [0, 0, 0];
+    this.last_throws = [false, false, false];
     this.active = true;
     this.thrown_in_turn = false;
   }
@@ -89,7 +108,7 @@ class Player {
   }
 }
 
-module.exports = class gameObj {
+export default class gameCls {
   constructor(playerArray, params) {
     // params = startscore, sets4win, legs4set, doubleOut
     var players = [];
@@ -109,6 +128,26 @@ module.exports = class gameObj {
     this.legs4set = params.legs4set;
     this.doubleOut = params.doubleOut;
     this.back_up = false; // in case of change operation
+  }
+
+  get_gameState() {
+    var gameState = [];
+    this.players.forEach(function (item, index) {
+      gameState.push(item.get_playerState());
+    });
+
+    return gameState;
+  }
+
+  get_throwState() {
+    const throws = this.players[this.selPlayer].last_throws;
+    console.log(throws);
+    const lastThrowsObj = {
+      first: { id: "1", throw: 1, score: throws[0], field: false },
+      second: { id: "2", throw: 2, score: throws[1], field: false },
+      third: { id: "3", throw: 3, score: throws[2], field: false },
+    };
+    return lastThrowsObj;
   }
 
   onThrow(score, multiplicator) {
@@ -204,7 +243,7 @@ module.exports = class gameObj {
     console.log("Overthrown");
     this.players[this.selPlayer].onOverthrow();
   }
-};
+}
 
 if (require.main === module) {
   const playerArray = [
@@ -213,7 +252,7 @@ if (require.main === module) {
   ];
 
   var match = new Match(playerArray, 501, 1, 2, true);
-
+  /*
   const readline = require("readline");
   const rl = readline.createInterface({
     input: process.stdin,
@@ -241,4 +280,5 @@ if (require.main === module) {
   };
 
   recursiveRead();
+  */
 }

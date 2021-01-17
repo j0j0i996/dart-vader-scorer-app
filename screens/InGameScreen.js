@@ -11,48 +11,56 @@ import colors from "../config/colors";
 import PlayerScoreComponent from "../components/PlayerScoreComponent";
 import { render } from "react-dom";
 import LiveDartsComponent from "../components/LiveDartsComponent";
+import {
+  initialization,
+  gameHandler,
+  get_gameState,
+  get_throwState,
+} from "../games/index.js";
+import { EventRegister } from "react-native-event-listeners";
+import { DeviceEventEmitter } from "react-native";
 
 export default function InGameScreen({ navigation }) {
-  const [selectedID, setSelection] = useState(1);
-
   const playerArray = [
     {
-      id: "1",
       name: "Jonathan",
-      remaining: 421,
-      scoreBoard: [
-        { k: "Sets", v: 1 },
-        { k: "Legs", v: 0 },
-      ],
-      stats: [
-        { k: "Last score", v: 180 },
-        { k: "Darts thrown", v: 7 },
-        { k: "Average", v: 104.38 },
-      ],
     },
     {
-      id: "2",
       name: "Sophie",
-      remaining: 501,
-      scoreBoard: [
-        { k: "Sets", v: 1 },
-        { k: "Legs", v: 1 },
-      ],
-      stats: [
-        { k: "Last score", v: 180 },
-        { k: "Darts thrown", v: 7 },
-        { k: "Average", v: 104.38 },
-      ],
     },
-    // { id: '3', name: 'Player 3', remaining: 501, scoreBoard: [{k:'Sets', v: 1}, {k:'Legs', v: 0}], stats: [{k:'Last score', v: 180}, {k:'Darts thrown', v: 7}, {k:'Average', v: 104.38}] },
-    //{ id: '4', name: 'Player 4', remaining: 501, scoreBoard: [{k:'Sets', v: 1}, {k:'Legs', v: 0}], stats: [{k:'Last score', v: 180}, {k:'Darts thrown', v: 7}, {k:'Average', v: 104.38}] },
   ];
 
-  const scoreObject = {
-    first: { id: "1", throw: 1, score: 20, field: "S20" },
-    second: { id: "2", throw: 2, score: 60, field: "T20" },
-    third: { id: "3", throw: 3, score: false, field: false },
+  const params = { startscore: 501, sets4win: 1, legs4set: 4, doubleOut: true };
+
+  const gameInitObj = {
+    gameType: "x01",
+    playerArray: playerArray,
+    params: params,
   };
+
+  initialization(gameInitObj);
+  const [gameState, setgameState] = useState(get_gameState());
+  const [throwState, setthrowState] = useState(get_throwState());
+
+  gameHandler();
+
+  const listener = DeviceEventEmitter.addListener("DartEvent", (data) => {
+    console.log(data);
+    setgameState(get_gameState());
+    setthrowState(get_throwState());
+  });
+
+  /*
+  gameExec = () => {
+    gameHandler();
+    gameState = get_gameState();
+    //setgameState(new_gameState);
+    //const new_throwState = get_throwState();
+    //setthrowState(new_throwState);
+    console.log(gameState);
+    //gameExec();
+  };
+  */
 
   const renderPlayerItem = ({ item }) => (
     <View
@@ -60,11 +68,12 @@ export default function InGameScreen({ navigation }) {
     >
       <PlayerScoreComponent
         name={item.name}
-        playerID={item.id}
+        id={item.id}
         remaining={item.remaining}
+        active={item.active}
         scoreBoard={item.scoreBoard}
         stats={item.stats}
-        isSelected={selectedID == parseInt(item.id) ? true : false}
+        active={item.active}
       />
     </View>
   );
@@ -74,12 +83,12 @@ export default function InGameScreen({ navigation }) {
       <View style={styles.list}>
         <FlatList
           numColumns={2}
-          data={playerArray}
+          data={gameState}
           renderItem={renderPlayerItem}
           listKey={"1"}
         />
       </View>
-      <LiveDartsComponent scoreObject={scoreObject} />
+      <LiveDartsComponent throwObject={throwState} />
     </View>
   );
 }

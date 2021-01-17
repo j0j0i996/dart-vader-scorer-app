@@ -1,15 +1,14 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList } from 'react-native';
-import colors from '../config/colors';
-import { Typography } from '../styles';
-import { Icon } from 'react-native-elements';
-
+import { StatusBar } from "expo-status-bar";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, FlatList } from "react-native";
+import colors from "../config/colors";
+import { Typography } from "../styles";
+import { Icon } from "react-native-elements";
 
 export default function PlayerScoreComponent(props) {
   return (
     <View style={styles.container}>
-      <NameView name={props.name} isSelected={props.isSelected}/>
+      <NameView name={props.name} active={props.active} />
       <ScoreBoardView scoreBoard={props.scoreBoard} />
       <RemainingView remaining={props.remaining} />
       <StatsView stats={props.stats} />
@@ -18,32 +17,37 @@ export default function PlayerScoreComponent(props) {
 }
 
 function NameView(props) {
-  if (props.isSelected) {
+  if (props.active) {
     return (
       <View style={styles.nameBox}>
         <View style={styles.turnMarker}>
-          <Icon name='arrow-right' color={colors.secondary} size={48} />
+          <Icon name="arrow-right" color={colors.secondary} size={48} />
         </View>
-        <View flex={0.8} paddingLeft={'10%'}>
-          <Text style={styles.header3} numberOfLines={1}>{props.name}</Text>
+        <View flex={0.8} paddingLeft={"10%"}>
+          <Text style={styles.header3} numberOfLines={1}>
+            {props.name}
+          </Text>
         </View>
       </View>
     );
   }
   return (
     <View style={styles.nameBox}>
-        <View flex={0.8} paddingLeft={'10%'}>
-          <Text style={styles.header3} numberOfLines={1}>{props.name}</Text>
-        </View>
+      <View flex={0.8} paddingLeft={"10%"}>
+        <Text style={styles.header3} numberOfLines={1}>
+          {props.name}
+        </Text>
+      </View>
     </View>
-  )
+  );
 }
 
 function ScoreBoardView(props) {
-
   const renderItem = ({ item }) => (
     <View style={styles.scoreBoardItem}>
-        <Text style={styles.scoreBoardText}>{item.k}: {item.v} </Text>
+      <Text style={styles.scoreBoardText}>
+        {item.k}: {item.v}{" "}
+      </Text>
     </View>
   );
 
@@ -54,25 +58,26 @@ function ScoreBoardView(props) {
         data={props.scoreBoard}
         renderItem={renderItem}
         keyExtractor={(item) => item.k}
-        listKey={'11'}
-        />
+        listKey={"11"}
+      />
     </View>
-  )
+  );
 }
 
 function RemainingView(props) {
   return (
     <View style={styles.remainingBox}>
-          <Text style={styles.header1}>{props.remaining}</Text>
+      <Text style={styles.header1}>{props.remaining}</Text>
     </View>
-  )
+  );
 }
 
 function StatsView(props) {
-
   const renderItem = ({ item }) => (
     <View style={styles.statsItem}>
-        <Text style={styles.statsText}>{item.k}: {item.v} </Text>
+      <Text style={styles.statsText}>
+        {item.k}: {item.v}{" "}
+      </Text>
     </View>
   );
 
@@ -83,10 +88,10 @@ function StatsView(props) {
         data={props.stats}
         renderItem={renderItem}
         keyExtractor={(item) => item.k}
-        listKey={'12'}
-        />
+        listKey={"12"}
+      />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -97,9 +102,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 10,
     paddingBottom: 10,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-around",
     borderColor: colors.gray,
     borderBottomWidth: 0.5,
   },
@@ -107,18 +112,18 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 0,
     paddingBottom: 0,
-    alignItems: 'center',
+    alignItems: "center",
     borderColor: colors.gray,
   },
   scoreBoardList: {
-    flex:1,
-    flexDirection: 'row',
-    alignSelf: 'center',
-    alignItems: 'center',
+    flex: 1,
+    flexDirection: "row",
+    alignSelf: "center",
+    alignItems: "center",
     //justifyContent: 'space-around',
   },
   scoreBoardItem: {
-    flex:1,
+    flex: 1,
     paddingLeft: 10,
     paddingRight: 10,
     margin: 5,
@@ -130,7 +135,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
   statsItem: {
-    flex:1,
+    flex: 1,
     paddingLeft: 10,
     paddingRight: 10,
     margin: 5,
@@ -150,7 +155,7 @@ const styles = StyleSheet.create({
     color: colors.gray,
   },
   turnMarker: {
-    left: '0%',
-    position: 'absolute',
+    left: "0%",
+    position: "absolute",
   },
 });

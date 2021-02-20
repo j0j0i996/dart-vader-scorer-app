@@ -15,9 +15,10 @@ import {
   initialization,
   get_gameState,
   get_throwState,
+  onGameEvent
 } from "../games/index.js";
 import { EventRegister } from "react-native-event-listeners";
-import { DeviceEventEmitter } from "react-native";
+import { NativeEventEmitter, NativeModules } from "react-native";
 
 export default function InGameScreen({ navigation }) {
   const playerArray = [
@@ -38,26 +39,39 @@ export default function InGameScreen({ navigation }) {
   };
 
   initialization(gameInitObj);
-  const [gameState, setgameState] = useState(get_gameState());
-  const [throwState, setthrowState] = useState(get_throwState());
+  const [gameState, set_gameState] = useState(get_gameState());
+  const [throwState, set_throwState] = useState(get_throwState());
+  
+  var ws = new WebSocket('ws://192.168.0.96:8765');
 
-  const listener = DeviceEventEmitter.addListener("DartEvent", (data) => {
-    console.log(data);
-    setgameState(get_gameState());
-    setthrowState(get_throwState());
-  });
-
-  /*
-  gameExec = () => {
-    gameHandler();
-    gameState = get_gameState();
-    //setgameState(new_gameState);
-    //const new_throwState = get_throwState();
-    //setthrowState(new_throwState);
-    console.log(gameState);
-    //gameExec();
+  ws.onopen = () => {
+    // connection opened
+    ws.send('greetings'); // send a message
   };
-  */
+
+  ws.onmessage = (e) => {
+    // a message was received
+    console.log('message received')
+    var res = e.data
+    var obj = JSON.parse(res)
+    console.log(res);
+
+    onGameEvent(obj.nextPlayer, obj.field, obj.multiplier)
+    set_gameState(get_gameState())
+    set_throwState(get_throwState())
+  };
+
+  ws.onerror = (e) => {
+    // an error occurred
+    console.log('error')
+    console.log(e.message);
+  };
+
+  ws.onclose = (e) => {
+    // connection closed
+    console.log('conn closed')
+    console.log(e.code, e.reason);
+  };
 
   const renderPlayerItem = ({ item }) => (
     <View

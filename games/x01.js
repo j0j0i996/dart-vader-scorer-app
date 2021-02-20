@@ -71,7 +71,7 @@ class Player {
   onOverthrow() {
     // deactivate player (for potential frustration throw :) )
     this.active = false;
-
+    console.log(nextPlayer)
     // reset score
     var last_throws = this.last_throws;
     var total = 0;
@@ -134,16 +134,16 @@ export default class gameCls {
 
   get_gameState() {
     var gameState = [];
-    this.players.forEach(function (item, index) {
+    this.players.forEach(function (item) {
       gameState.push(item.get_playerState());
     });
-    console.log(gameState);
+    //console.log(gameState);
     return gameState;
   }
 
   get_throwState() {
     const throws = this.players[this.selPlayer].last_throws;
-    console.log(throws);
+    //console.log(throws);
     const lastThrowsObj = {
       first: { id: "1", throw: 1, score: throws[0], field: false },
       second: { id: "2", throw: 2, score: throws[1], field: false },
@@ -152,17 +152,17 @@ export default class gameCls {
     return lastThrowsObj;
   }
 
-  onThrow(score, multiplicator) {
+  onThrow(field, multiplicator) {
     this.players[this.selPlayer].thrown_in_turn = true;
     //testing
     console.log("Dart " + this.num_throw);
 
     if (this.players[this.selPlayer].active) {
-      if (this.players[this.selPlayer].remaining - score > 1) {
+      if (this.players[this.selPlayer].remaining - field > 1) {
         // normal throw
-        this.players[this.selPlayer].onThrow(score, this.num_throw);
+        this.players[this.selPlayer].onThrow(field, this.num_throw);
       } else if (
-        (this.players[this.selPlayer].remaining - score == 0) &
+        (this.players[this.selPlayer].remaining - field == 0) &
         (this.doubleOut & (multiplicator == 2) || this.doubleOut != true)
       ) {
         //end of leg
@@ -176,9 +176,12 @@ export default class gameCls {
   }
 
   onNextPlayer() {
+    console.log('onNextPlayer exec')
     // only if player has thrown yet
+    //console.log(this.players[this.selPlayer].thrown_in_turn)
     if (this.players[this.selPlayer].thrown_in_turn) {
       this.nextPlayer();
+      console.log('thrown_in_turn')
     }
   }
 

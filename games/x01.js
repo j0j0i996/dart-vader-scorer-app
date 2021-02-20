@@ -112,9 +112,11 @@ export default class gameCls {
   constructor(playerArray, params) {
     // params = startscore, sets4win, legs4set, doubleOut
     var players = [];
+    id = 0;
     playerArray.forEach(function (item, index) {
-      let p = new Player(item.name, params.startscore);
+      let p = new Player(item.name, id, params.startscore);
       players.push(p);
+      id += 1;
     });
 
     this.players = players;
@@ -135,7 +137,7 @@ export default class gameCls {
     this.players.forEach(function (item, index) {
       gameState.push(item.get_playerState());
     });
-
+    console.log(gameState);
     return gameState;
   }
 

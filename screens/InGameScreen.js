@@ -13,7 +13,6 @@ import { render } from "react-dom";
 import LiveDartsComponent from "../components/LiveDartsComponent";
 import {
   initialization,
-  gameHandler,
   get_gameState,
   get_throwState,
 } from "../games/index.js";
@@ -41,8 +40,6 @@ export default function InGameScreen({ navigation }) {
   initialization(gameInitObj);
   const [gameState, setgameState] = useState(get_gameState());
   const [throwState, setthrowState] = useState(get_throwState());
-
-  gameHandler();
 
   const listener = DeviceEventEmitter.addListener("DartEvent", (data) => {
     console.log(data);

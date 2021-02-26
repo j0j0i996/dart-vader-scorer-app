@@ -11,38 +11,37 @@ import colors from "../config/colors";
 import PlayerScoreComponent from "../components/PlayerScoreComponent";
 import { render } from "react-dom";
 import LiveDartsComponent from "../components/LiveDartsComponent";
-import {
-  initialization,
-  get_gameState,
-  get_throwState,
-  onGameEvent
-} from "../games/index.js";
+import gameHandler  from "../games/index.js";
 import { EventRegister } from "react-native-event-listeners";
 import { NativeEventEmitter, NativeModules } from "react-native";
 
+const playerArray = [
+  {
+    name: "Jonathan",
+  },
+  {
+    name: "Sophie",
+  },
+];
+
+const params = { startscore: 501, sets4win: 1, legs4set: 4, doubleOut: true };
+
+const gameInitObj = {
+  gameType: "x01",
+  playerArray: playerArray,
+  params: params,
+};
+
+const game_handler = new gameHandler(gameInitObj);
+console.log('game handler initialized')
+
+
 export default function InGameScreen({ navigation }) {
-  const playerArray = [
-    {
-      name: "Jonathan",
-    },
-    {
-      name: "Sophie",
-    },
-  ];
-
-  const params = { startscore: 501, sets4win: 1, legs4set: 4, doubleOut: true };
-
-  const gameInitObj = {
-    gameType: "x01",
-    playerArray: playerArray,
-    params: params,
-  };
-
-  initialization(gameInitObj);
-  const [gameState, set_gameState] = useState(get_gameState());
-  const [throwState, set_throwState] = useState(get_throwState());
   
-  var ws = new WebSocket('ws://192.168.0.96:8765');
+  const [gameState, set_gameState] = useState(game_handler.get_gameState());
+  const [throwState, set_throwState] = useState(game_handler.get_throwState());
+  
+  var ws = new WebSocket('ws://192.168.0.10:8765');
 
   ws.onopen = () => {
     // connection opened
@@ -56,9 +55,9 @@ export default function InGameScreen({ navigation }) {
     var obj = JSON.parse(res)
     console.log(res);
 
-    onGameEvent(obj.nextPlayer, obj.field, obj.multiplier)
-    set_gameState(get_gameState())
-    set_throwState(get_throwState())
+    game_handler.onGameEvent(obj.nextPlayer, obj.field, obj.multiplier)
+    set_gameState(game_handler.get_gameState())
+    set_throwState(game_handler.get_throwState())
   };
 
   ws.onerror = (e) => {

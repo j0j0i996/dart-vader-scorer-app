@@ -1,35 +1,30 @@
 import axios from "axios";
 import gameCls from "./x01.js";
 import { EventRegister } from "react-native-event-listeners";
-import { NativeEventEmitter } from "react-native";
-//import { w3cwebsocket as W3CWebSocket } from "websocket";
 
-var gameObj;
-//192.168.0.96
-
-export function initialization(gameInitObj) {
-  if (gameInitObj.gameType == "x01") {
-    gameObj = new gameCls(gameInitObj.playerArray, gameInitObj.params);
+export default class gameHandler {
+  constructor(gameInitObj) {
+    this.gameObj = new gameCls(gameInitObj.playerArray, gameInitObj.params)
   }
-}
 
-export function onGameEvent(nextPlayer, field, multiplier) {
+  onGameEvent(nextPlayer, field, multiplier) {
 
-  if (nextPlayer) {
-    gameObj.onNextPlayer();
-    //DeviceEventEmitter.emit("DartEvent", "Next player");
-  } else {
-    gameObj.onThrow(field, multiplier);
-    //DeviceEventEmitter.emit("DartEvent", "Throw");
+    if (nextPlayer) {
+      this.gameObj.onNextPlayer();
+      //DeviceEventEmitter.emit("DartEvent", "Next player");
+    } else {
+      this.gameObj.onThrow(field, multiplier);
+      //DeviceEventEmitter.emit("DartEvent", "Throw");
+    }
+  };
+
+  get_gameState() {
+    return this.gameObj.get_gameState();
   }
-};
 
-export function get_gameState() {
-  return gameObj.get_gameState();
-}
-
-export function get_throwState() {
-  return gameObj.get_throwState();
+  get_throwState() {
+    return this.gameObj.get_throwState();
+  }
 }
 
 if (require.main === module) {

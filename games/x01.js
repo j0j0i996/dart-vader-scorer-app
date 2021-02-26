@@ -11,7 +11,8 @@ class Player {
     this.darts_thrown_total = 0;
     this.points_thrown_total = 0;
     this.avg = 0;
-    this.last_throws = [false, false, false];
+    this.turn_scores = [false, false, false];
+    this.turn_sections = [false, false, false];
     this.thrown_in_turn = false;
     this.active = false;
   }
@@ -49,9 +50,10 @@ class Player {
     };
   }
 
-  onThrow(score, num_throw) {
+  onThrow(score, section, num_throw) {
     this.remaining -= score;
-    this.last_throws[num_throw] = score;
+    this.turn_scores[num_throw] = score;
+    this.turn_sections[num_throw] = section;
     this.darts_thrown_leg++;
     this.darts_thrown_total++;
     this.points_thrown_total += score;
@@ -73,9 +75,9 @@ class Player {
     this.active = false;
     console.log(nextPlayer)
     // reset score
-    var last_throws = this.last_throws;
+    var turn_scores = this.turn_scores;
     var total = 0;
-    last_throws.forEach(function (item, index) {
+    turn_scores.forEach(function (item, index) {
       total += item;
     });
 
@@ -84,7 +86,8 @@ class Player {
     this.darts_thrown_leg++;
     this.darts_thrown_total++;
     this.avg = (this.points_thrown_total / this.darts_thrown_total) * 3;
-    this.last_throws = [false, false, false];
+    this.turn_scores = [false, false, false];
+    this.turn_sections = [false, false, false];
   }
 
   onNextLeg() {
@@ -93,7 +96,8 @@ class Player {
   }
 
   onTurnStart() {
-    this.last_throws = [false, false, false];
+    this.turn_scores = [false, false, false];
+    this.turn_sections = [false, false, false];
     this.active = true;
     this.thrown_in_turn = false;
   }
@@ -101,8 +105,8 @@ class Player {
   onTurnEnd() {
     this.active = false;
     var score = 0;
-    for (var i in this.last_throws) {
-      score += this.last_throws[i];
+    for (var i in this.turn_scores) {
+      score += this.turn_scores[i];
     }
     this.last_score = score;
   }
@@ -142,28 +146,31 @@ export default class gameCls {
   }
 
   get_throwState() {
-    const throws = this.players[this.selPlayer].last_throws;
+    const scores = this.players[this.selPlayer].turn_scores;
+    const sections = this.players[this.selPlayer].turn_sections;
     //console.log(throws);
     const lastThrowsObj = {
-      first: { id: "1", throw: 1, score: throws[0], field: false },
-      second: { id: "2", throw: 2, score: throws[1], field: false },
-      third: { id: "3", throw: 3, score: throws[2], field: false },
+      first: { id: "1", throw: 1, score: scores[0], section: sections[0] },
+      second: { id: "2", throw: 2, score: scores[1], section: sections[1] },
+      third: { id: "3", throw: 3, score: scores[2], section: sections[2] },
     };
     return lastThrowsObj;
   }
 
-  onThrow(field, multiplicator) {
+  onThrow(field, multiplier) {
     this.players[this.selPlayer].thrown_in_turn = true;
     //testing
     console.log("Dart " + this.num_throw);
+    var score = field * multiplier;
+    var section =((multiplier == 1) ? 'S' : ((multiplier == 2) ? 'D' : 'T')) + String(field)
 
     if (this.players[this.selPlayer].active) {
-      if (this.players[this.selPlayer].remaining - field > 1) {
+      if (this.players[this.selPlayer].remaining - score > 1) {
         // normal throw
-        this.players[this.selPlayer].onThrow(field, this.num_throw);
+        this.players[this.selPlayer].onThrow(score, section, this.num_throw);
       } else if (
-        (this.players[this.selPlayer].remaining - field == 0) &
-        (this.doubleOut & (multiplicator == 2) || this.doubleOut != true)
+        (this.players[this.selPlayer].remaining - score == 0) &
+        (this.doubleOut & (multiplier == 2) || this.doubleOut != true)
       ) {
         //end of leg
         this.onLegEnd();

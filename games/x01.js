@@ -110,6 +110,15 @@ class Player {
     }
     this.last_score = score;
   }
+
+  remove_throw(throw_idx) {
+    this.remaining -= this.turn_scores[throw_idx];
+    this.darts_thrown_leg--;
+    this.darts_thrown_total--;
+    this.points_thrown_total += this.turn_scores[throw_idx];
+    this.turn_sections[throw_idx] = false;
+    this.turn_scores[throw_idx] = false;
+  }
 }
 
 export default class gameCls {
@@ -160,7 +169,6 @@ export default class gameCls {
   onThrow(field, multiplier) {
     this.players[this.selPlayer].thrown_in_turn = true;
     //testing
-    console.log("Dart " + this.num_throw);
     var score = field * multiplier;
     var section =((multiplier == 1) ? 'S' : ((multiplier == 2) ? 'D' : 'T')) + String(field)
 
@@ -190,6 +198,37 @@ export default class gameCls {
       this.nextPlayer();
       console.log('thrown_in_turn')
     }
+  }
+
+  correct_score(turn_idx, multiplier, field) {
+    turn_idx--;
+    console.log(turn_idx) //array starts at 0
+    var turn_sections = this.players[this.selPlayer].turn_sections
+    var thrown_in_turn = this.players[this.selPlayer].thrown_in_turn
+
+    console.log(this.players[this.selPlayer].turn_sections)
+
+    var i;
+    for (i = 2; i >= turn_idx; i--) {
+      console.log(i)
+      if (turn_sections[i] != false) {
+        this.players[this.selPlayer].remove_throw(i)
+      }
+    }
+
+    for (i = turn_idx; i < 3; i++) {
+      if (i == turn_idx) {
+        this.onThrow(field, multiplier)
+      }
+      else if (turn_sections[i] != false) {
+        var field_temp = turn_sections[i].substring(1)
+        var multiplier_temp = turn_sections[i].substring(0,1);
+        console.log(field_temp)
+        console.log(multiplier_temp)
+        //var section =((multiplier == 1) ? 'S' : ((multiplier == 2) ? 'D' : 'T')) + String(field)
+      }
+    }
+    //console.log(turn_sections)
   }
 
   nextPlayer() {

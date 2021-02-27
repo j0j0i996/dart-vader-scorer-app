@@ -5,6 +5,7 @@ import { EventRegister } from "react-native-event-listeners";
 export default class gameHandler {
   constructor(gameInitObj) {
     this.gameObj = new gameCls(gameInitObj.playerArray, gameInitObj.params)
+    console.log('game handler initialized') 
   }
 
   onGameEvent(nextPlayer, field, multiplier) {
@@ -17,6 +18,10 @@ export default class gameHandler {
       //DeviceEventEmitter.emit("DartEvent", "Throw");
     }
   };
+
+  correct_score(throw_idx, multiplier, field) {
+    this.gameObj.correct_score(throw_idx, multiplier, field)
+  }
 
   get_gameState() {
     return this.gameObj.get_gameState();

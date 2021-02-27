@@ -32,8 +32,7 @@ const gameInitObj = {
   params: params,
 };
 
-const game_handler = new gameHandler(gameInitObj);
-console.log('game handler initialized')
+let game_handler = new gameHandler(gameInitObj);
 
 
 export default function InGameScreen({ navigation }) {
@@ -41,7 +40,7 @@ export default function InGameScreen({ navigation }) {
   const [gameState, set_gameState] = useState(game_handler.get_gameState());
   const [throwState, set_throwState] = useState(game_handler.get_throwState());
   
-  var ws = new WebSocket('ws://192.168.0.10:8765');
+  var ws = new WebSocket('ws://192.168.0.96:8765');
 
   ws.onopen = () => {
     // connection opened
@@ -98,9 +97,27 @@ export default function InGameScreen({ navigation }) {
           listKey={"1"}
         />
       </View>
-      <LiveDartsComponent throwObject={throwState} />
+      <LiveDartsComponent throwObject={throwState} corr_handler={corr_handler} />
     </View>
   );
+
+  function corr_handler(throw_idx, multiplier, field) {
+    throw_idx = parseInt(throw_idx)
+    multiplier = parseInt(multiplier)
+    field = parseInt(field)
+  
+    var score = multiplier * field
+    if (score > 60) {
+      alert("Nice try :) \nScore over 60 not possible.")
+      return false
+    }
+    
+    game_handler.correct_score(throw_idx, multiplier, field)
+    set_gameState(game_handler.get_gameState())
+    set_throwState(game_handler.get_throwState())
+
+    return true
+  }
 }
 
 const styles = StyleSheet.create({

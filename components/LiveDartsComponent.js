@@ -1,24 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Modal, Pressable, TextInput } from "react-native";
+import { StyleSheet, Text, View, Modal, Pressable, TouchableOpacity, TouchableWithoutFeedback, ScrollView} from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import colors from "../config/colors";
 import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
-import { color } from "react-native-reanimated";
+import SwipePicker from 'react-native-swipe-picker'
+
+//import DynamicallySelectedPicker from 'react-native-dynamically-selected-picker';
+//import {LinearGradient} from 'expo-linear-gradient'
 
 export default function LiveDartsComponent(props) {
   return (
     <View style={styles.container}>
-      <SingleDartView throwObject={props.throwObject.first} />
-      <SingleDartView throwObject={props.throwObject.second} />
-      <SingleDartView throwObject={props.throwObject.third} />
+      <SingleDartView throwObject={props.throwObject.first} corr_handler={props.corr_handler}/>
+      <SingleDartView throwObject={props.throwObject.second} corr_handler={props.corr_handler}/>
+      <SingleDartView throwObject={props.throwObject.third} corr_handler={props.corr_handler}/>
     </View>
   );
 }
 
 function SingleDartView(props) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedValue, setSelectedValue] = useState("Single");
+  const [selectedMultiplier, setSelectedMultiplier] = useState("1");
+  const [selectedField, setSelectedField] = useState('10');
+
   return (
     <View
       style={[
@@ -40,31 +45,46 @@ function SingleDartView(props) {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.header3_gray}>Correct score</Text>
+            <Text style={styles.header4}>Dart {props.throwObject.throw}</Text>
             <Picker
-              selectedValue={selectedValue}
+              selectedValue={selectedMultiplier}
               style={{ height: 50, width: 150 }}
               mode='dropdown'
-              //onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+              onValueChange={(itemValue, itemIndex) => setSelectedMultiplier(itemValue)}
             >
-              <Picker.Item label="Single" value="single" />
-              <Picker.Item label="Double" value="double" />
-              <Picker.Item label="Triple" value="triple" />
+              <Picker.Item label="Single" value="1"/>
+              <Picker.Item label="Double" value="2" />
+              <Picker.Item label="Triple" value="3" />
             </Picker>
-            <TextInput 
-              style={styles.textInput}
-              keyboardType='numeric'
-              //onChangeText={(text)=> this.onChanged(text)}
-              //value={this.state.myNumber}
-              maxLength={2}  //setting limit of input
+
+            <SwipePicker
+              items={get_fields()}
+              initialSelectedIndex={10}
+              onChange={({ item }) => {
+                var value = item.value
+                setSelectedField(value)
+              }}
+              height={ 80 }
+              width={ 150 }
             />
 
-            <Pressable
-              style={[styles.button, styles.buttonClose]}
-              onPress={() => setModalVisible(!modalVisible)}
-            >
-              <Text style={styles.textStyle}>Hide Modal</Text>
-            </Pressable>
+            <View style={styles.buttonList}>
+              <Pressable
+                style={[styles.button, styles.buttonDiscard]}
+                onPress={() => setModalVisible(!modalVisible)}
+              >
+                <Text style={styles.text}>Discard</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.button, styles.buttonSave]}
+                onPress={() => {
+                  var success = props.corr_handler(props.throwObject.throw,selectedMultiplier,selectedField);
+                  setModalVisible(!success);
+                }}
+              >
+                <Text style={styles.text}>Save</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
@@ -88,7 +108,15 @@ function SingleDartView(props) {
   );
 }
 
-// create a flat list picker function
+function get_fields() {
+  var i;
+  var fields = [];
+  for (i = 0; i <= 20; i++) {
+  	fields.push({value:i, label: String(i)});
+  }
+  fields.push({value:25, label: String(25)})
+  return fields
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -96,7 +124,6 @@ const styles = StyleSheet.create({
     margin: 10,
     justifyContent: "space-around",
     flexDirection: "row",
-    marginBottom: 5,
   },
   singleDartBox: {
     flex: 1,
@@ -118,6 +145,14 @@ const styles = StyleSheet.create({
     ...Typography.header3,
     color: colors.gray,
   },
+  header4: {
+    ...Typography.header4,
+    color: colors.gray,
+  },
+  text_large: {
+    ...Typography.text_large,
+    color: colors.gray,
+  },
   text: {
     ...Typography.text,
     color: colors.white,
@@ -129,10 +164,10 @@ const styles = StyleSheet.create({
     marginTop: 0
   },
   modalView: {
-    margin: 20,
+    margin: 0,
     backgroundColor: colors.background1,
     borderRadius: 20,
-    padding: 50,
+    padding: 10,
     alignItems: "center",
     justifyContent: "flex-start",
     shadowColor: "#000",
@@ -144,4 +179,21 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5
   },
+  button: {
+    borderRadius: 15,
+    padding: 10,
+    elevation: 1,
+    margin: 10,
+  },
+  buttonSave: {
+    backgroundColor: colors.primary,
+  },
+  buttonDiscard: {
+    backgroundColor: colors.lightgray,
+  },
+  buttonList: {
+    margin: 10,
+    justifyContent: "space-around",
+    flexDirection: "row",
+  }
 });

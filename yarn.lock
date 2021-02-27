@@ -3342,6 +3342,11 @@ expo-keep-awake@~8.4.0:
   resolved "https://registry.yarnpkg.com/expo-keep-awake/-/expo-keep-awake-8.4.0.tgz#346d0988e6364c46050fef4b7829f302ef3e603d"
   integrity sha512-gozpL5Azfaht/YIMFOHRHjHuJ9KT6hJH4y71Al+/YfQSwHS5sqhoKGPgSxaktqbxRrWVUH9q7wSl3EXRK9bYjA==
 
+expo-linear-gradient@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-5.0.1.tgz#b4f5450d680b9315f22f4f99fee6a2b90fb49d92"
+  integrity sha512-5dKn9JIXmXXHq6itC/Jpqo65Tkgjwacyw1kpD8sekoFTEVfT6ciFd2djqIcciUqIa57FF/5d2q54mUvjoqD/TA==
+
 expo-linear-gradient@~8.4.0:
   version "8.4.0"
   resolved "https://registry.yarnpkg.com/expo-linear-gradient/-/expo-linear-gradient-8.4.0.tgz#34e6f960b1971c57dacf7211c747ba490a76bf63"
@@ -6305,6 +6310,15 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
 
+react-native-dynamically-selected-picker@^2.0.0, react-native-dynamically-selected-picker@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-dynamically-selected-picker/-/react-native-dynamically-selected-picker-2.0.1.tgz#4858561dfcfd1441354a57297cdc478278326c38"
+  integrity sha512-uwQ21Mih9KClP05RXPNjKrzTfpm328NF7Hyzlh/mAkf+I16IhB0yYpXeaVokwZJP8gclzPb/VtoZAQUQ61h6Hw==
+  dependencies:
+    prop-types "^15.7.2"
+    react-native-dynamically-selected-picker "^2.0.0"
+    react-native-linear-gradient "^2.5.6"
+
 react-native-elements@^3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/react-native-elements/-/react-native-elements-3.1.0.tgz#ff2d6fd0ed91b1ebdd15598c4da1fcb2d5780c5f"
@@ -6345,6 +6359,11 @@ react-native-iphone-x-helper@^1.3.0:
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.3.1.tgz#20c603e9a0e765fd6f97396638bdeb0e5a60b010"
   integrity sha512-HOf0jzRnq2/aFUcdCJ9w9JGzN3gdEg0zFE4FyYlp4jtidqU03D5X7ZegGKfT1EWteR0gPBGp9ye5T5FvSWi9Yg==
 
+react-native-linear-gradient@^2.5.6:
+  version "2.5.6"
+  resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.5.6.tgz#96215cbc5ec7a01247a20890888aa75b834d44a0"
+  integrity sha512-HDwEaXcQIuXXCV70O+bK1rizFong3wj+5Q/jSyifKFLg0VWF95xh8XQgfzXwtq0NggL9vNjPKXa016KuFu+VFg==
+
 react-native-ratings@^7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/react-native-ratings/-/react-native-ratings-7.3.0.tgz#32e11e4ed944ba8adbbc995d601df3f131619b6f"
@@ -6375,6 +6394,14 @@ react-native-size-matters@^0.3.1:
   resolved "https://registry.yarnpkg.com/react-native-size-matters/-/react-native-size-matters-0.3.1.tgz#24d0cfc335a2c730f6d58bd7b43ea5a41be4b49f"
   integrity sha512-mKOfBLIBFBcs9br1rlZDvxD5+mAl8Gfr5CounwJtxI6Z82rGrMO+Kgl9EIg3RMVf3G855a85YVqHJL2f5EDRlw==
 
+react-native-swipe-picker@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/react-native-swipe-picker/-/react-native-swipe-picker-0.1.4.tgz#ca11b7bd052d133d64e0ecfdcc8d9f5efa45b562"
+  integrity sha512-8qbAutCYfHYKUzCsmwLaNsgvZDPQWeoHyLbwmyXMrzP4rniHoioWilLcOQmWkXmPEIfP/bDcqrSaKOIXRXNOcA==
+  dependencies:
+    expo-linear-gradient "^5.0.1"
+    prop-types "^15.7.2"
+
 react-native-web@~0.13.12:
   version "0.13.18"
   resolved "https://registry.yarnpkg.com/react-native-web/-/react-native-web-0.13.18.tgz#964f058a16521a3b9a31b091415edfef5b6ef305"
@@ -6389,6 +6416,11 @@ react-native-web@~0.13.12:
     normalize-css-color "^1.0.2"
     prop-types "^15.6.0"
     react-timer-mixin "^0.13.4"
+
+react-native-wheel-scrollview-picker@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-wheel-scrollview-picker/-/react-native-wheel-scrollview-picker-1.0.1.tgz#be2d1d9b398565c82f4e4fbeafb109950420a0d0"
+  integrity sha512-cKlcTc6/esq+3Rcsvh9hTTnjNpvO1JUc9sP/NgN/iO/wXOHdvy0X4Nc7URO31c//pmdkc5OgnVmM6E6RfuCogA==
 
 "react-native@https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz":
   version "0.63.2"

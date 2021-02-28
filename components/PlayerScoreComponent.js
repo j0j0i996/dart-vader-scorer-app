@@ -76,7 +76,7 @@ function StatsView(props) {
   const renderItem = ({ item }) => (
     <View style={styles.statsItem}>
       <Text style={styles.statsText}>
-        {item.k}: {item.v}{" "}
+        {item.k}: {item.v.toFixed(2)}{" "}
       </Text>
     </View>
   );

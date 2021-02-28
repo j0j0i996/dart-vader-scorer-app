@@ -50,10 +50,10 @@ class Player {
     };
   }
 
-  onThrow(score, section, num_throw) {
+  onThrow(score, section, throw_idx) {
     this.remaining -= score;
-    this.turn_scores[num_throw] = score;
-    this.turn_sections[num_throw] = section;
+    this.turn_scores[throw_idx] = score;
+    this.turn_sections[throw_idx] = section;
     this.darts_thrown_leg++;
     this.darts_thrown_total++;
     this.points_thrown_total += score;
@@ -112,12 +112,14 @@ class Player {
   }
 
   remove_throw(throw_idx) {
-    this.remaining -= this.turn_scores[throw_idx];
+    this.remaining += this.turn_scores[throw_idx];
+    this.points_thrown_total -= this.turn_scores[throw_idx];
     this.darts_thrown_leg--;
     this.darts_thrown_total--;
-    this.points_thrown_total += this.turn_scores[throw_idx];
     this.turn_sections[throw_idx] = false;
     this.turn_scores[throw_idx] = false;
+
+    console.log('Throw removed')
   }
 }
 
@@ -137,7 +139,7 @@ export default class gameCls {
     this.players[this.selPlayer].active = true;
     this.lastLegStarter = 0;
     this.lastSetStarter = 0;
-    this.num_throw = 0;
+    this.throw_idx = 0;
     this.startscore = params.startscore;
     this.sets4win = params.sets4win;
     this.legs4set = params.legs4set;
@@ -175,7 +177,7 @@ export default class gameCls {
     if (this.players[this.selPlayer].active) {
       if (this.players[this.selPlayer].remaining - score > 1) {
         // normal throw
-        this.players[this.selPlayer].onThrow(score, section, this.num_throw);
+        this.players[this.selPlayer].onThrow(score, section, this.throw_idx);
       } else if (
         (this.players[this.selPlayer].remaining - score == 0) &
         (this.doubleOut & (multiplier == 2) || this.doubleOut != true)
@@ -187,7 +189,7 @@ export default class gameCls {
         this.onOverthrow();
       }
     }
-    this.num_throw += 1;
+    this.throw_idx += 1;
   }
 
   onNextPlayer() {
@@ -200,32 +202,40 @@ export default class gameCls {
     }
   }
 
-  correct_score(turn_idx, multiplier, field) {
-    turn_idx--;
-    console.log(turn_idx) //array starts at 0
-    var turn_sections = this.players[this.selPlayer].turn_sections
-    var thrown_in_turn = this.players[this.selPlayer].thrown_in_turn
+  correct_score(throw_idx, multiplier, field) {
+    throw_idx--;
+    console.log(throw_idx) //array starts at 0
+    const turn_sections = { ...this.players[this.selPlayer].turn_sections };
+    const darts_thrown_in_turn = this.throw_idx
 
-    console.log(this.players[this.selPlayer].turn_sections)
+    console.log(turn_sections)
+    console.log(this.throw_idx)
 
     var i;
-    for (i = 2; i >= turn_idx; i--) {
+    for (i = 2; i >= throw_idx; i--) {
       console.log(i)
       if (turn_sections[i] != false) {
-        this.players[this.selPlayer].remove_throw(i)
+        this.players[this.selPlayer].remove_throw(i);
+        this.throw_idx--;
       }
     }
 
-    for (i = turn_idx; i < 3; i++) {
-      if (i == turn_idx) {
+    var kvArray = [['S', 1], ['D', 2], ['T', 3]];
+    var MultiplierMap = new Map(kvArray);
+
+    console.log(turn_sections)
+    for (i = throw_idx; i < 3; i++) {
+      if (i == throw_idx) {
+        this.throw_idx = i;
         this.onThrow(field, multiplier)
       }
       else if (turn_sections[i] != false) {
-        var field_temp = turn_sections[i].substring(1)
-        var multiplier_temp = turn_sections[i].substring(0,1);
-        console.log(field_temp)
-        console.log(multiplier_temp)
-        //var section =((multiplier == 1) ? 'S' : ((multiplier == 2) ? 'D' : 'T')) + String(field)
+        this.throw_idx = i;
+        var field_temp = parseInt(turn_sections[i].substring(1))
+        var multiplier_temp = MultiplierMap.get(turn_sections[i].substring(0,1));
+        console.log('field: ' + field_temp)
+        console.log('multiplier: ' + multiplier_temp)
+        this.onThrow(field_temp, multiplier_temp)
       }
     }
     //console.log(turn_sections)
@@ -242,7 +252,7 @@ export default class gameCls {
   }
 
   activatePlayer(id) {
-    this.num_throw = 0;
+    this.throw_idx = 0;
     this.selPlayer = id;
     this.players[this.selPlayer].onTurnStart();
   }

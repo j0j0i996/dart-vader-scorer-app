@@ -28,7 +28,7 @@ function SingleDartView(props) {
     <View
       style={[
         styles.singleDartBox,
-        props.throwObject.score
+        props.throwObject.score === parseInt(props.throwObject.score, 10)
           ? { backgroundColor: colors.primary }
           : { backgroundColor: colors.lightgray },
       ]}
@@ -41,6 +41,8 @@ function SingleDartView(props) {
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
           setModalVisible(!modalVisible);
+          setSelectedField('10')
+          setSelectedMultiplier("1")
         }}
       >
         <View style={styles.centeredView}>
@@ -71,7 +73,11 @@ function SingleDartView(props) {
             <View style={styles.buttonList}>
               <Pressable
                 style={[styles.button, styles.buttonDiscard]}
-                onPress={() => setModalVisible(!modalVisible)}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                  setSelectedField('10');
+                  setSelectedMultiplier("1");
+                }}
               >
                 <Text style={styles.text}>Discard</Text>
               </Pressable>
@@ -80,6 +86,10 @@ function SingleDartView(props) {
                 onPress={() => {
                   var success = props.corr_handler(props.throwObject.throw,selectedMultiplier,selectedField);
                   setModalVisible(!success);
+                  if (success) {
+                    setSelectedField('10');
+                    setSelectedMultiplier("1");
+                  }
                 }}
               >
                 <Text style={styles.text}>Save</Text>

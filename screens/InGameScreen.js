@@ -102,6 +102,7 @@ export default function InGameScreen({ navigation }) {
   );
 
   function corr_handler(throw_idx, multiplier, field) {
+    console.log('Field: ' + field)
     throw_idx = parseInt(throw_idx)
     multiplier = parseInt(multiplier)
     field = parseInt(field)

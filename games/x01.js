@@ -73,7 +73,7 @@ class Player {
   onOverthrow() {
     // deactivate player (for potential frustration throw :) )
     this.active = false;
-    console.log(nextPlayer)
+
     // reset score
     var turn_scores = this.turn_scores;
     var total = 0;
@@ -269,7 +269,7 @@ export default class gameCls {
 
     if (this.players[this.selPlayer].legs == this.legs4set) {
       //set won
-      onSetEnd();
+      this.onSetEnd();
     } else {
       //activate player to start next leg
       var id =

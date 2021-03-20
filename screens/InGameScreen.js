@@ -53,7 +53,7 @@ export default class InGameScreen extends React.Component {
   connect() {
 
     //set_conn(false)
-    var ws = new WebSocket('ws://192.168.0.100:8765');
+    var ws = new WebSocket('ws://192.168.43.202:8764');
     var self = this
 
     ws.onopen = () => {
@@ -65,6 +65,7 @@ export default class InGameScreen extends React.Component {
 
     ws.onclose = (e) => {
       // connection closed
+      ws.send('bye');
       console.log('onclose')
       console.log(this.state.connected)
       if (self.state.connected) {
@@ -80,14 +81,21 @@ export default class InGameScreen extends React.Component {
 
     ws.onmessage = (e) => {
       // a message was received
-      console.log('message received')
+      console.log(e)
+
       var res = e.data
       var obj = JSON.parse(res)
-      console.log(res);
-  
-      game_handler.onGameEvent(obj.nextPlayer, obj.field, obj.multiplier)
-      self.setState({gameState: game_handler.get_gameState()})
-      self.setState({throwState: game_handler.get_throwState()})
+
+      if (obj.type == 'message') {
+        console.log(obj.data);
+      }
+      else if (obj.type == 'event') {
+        console.log(obj.data)
+        //var data = JSON.parse(obj)
+        game_handler.onGameEvent(obj.data.nextPlayer, obj.data.field, obj.data.multiplier)
+        self.setState({gameState: game_handler.get_gameState()})
+        self.setState({throwState: game_handler.get_throwState()})
+      }
     };
 
     ws.onerror = (e) => {

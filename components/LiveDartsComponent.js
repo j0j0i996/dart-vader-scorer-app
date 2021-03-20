@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Modal, Pressable, TouchableOpacity, TouchableWithoutFeedback, ScrollView} from "react-native";
+import { StyleSheet, Text, View, Modal, Pressable, Button, TouchableOpacity, TouchableWithoutFeedback, ScrollView} from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import colors from "../config/colors";
 import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
 import SwipePicker from 'react-native-swipe-picker'
+import RNPickerSelect from 'react-native-picker-select';
 
 //import DynamicallySelectedPicker from 'react-native-dynamically-selected-picker';
 //import {LinearGradient} from 'expo-linear-gradient'
@@ -21,8 +22,25 @@ export default function LiveDartsComponent(props) {
 
 function SingleDartView(props) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedMultiplier, setSelectedMultiplier] = useState("1");
+  const [selectedMultiplier, setSelectedMultiplier] = useState('1');
   const [selectedField, setSelectedField] = useState('10');
+
+  function MultiSelector(props) {
+    return (
+      <Pressable
+                style={[styles.selectorElem, selectedMultiplier == props.value ? {backgroundColor: colors.primary} : {backgroundColor: colors.white}]}
+                onPress={() => {setSelectedMultiplier(props.value);}}>
+        <Text style={styles.text, selectedMultiplier == props.value ? {color: colors.white} : {color: colors.primary}}>{props.label}</Text>
+      </Pressable>
+    );
+  }
+
+  var multipliers = [["Single","1"],["Double","2"],["Triple","3"]];
+  var elements=[];
+
+  for(var i=0;i<multipliers.length;i++){
+    elements.push(<MultiSelector label={multipliers[i][0]} value={multipliers[i][1]}/>);
+  }
 
   return (
     <View
@@ -48,27 +66,21 @@ function SingleDartView(props) {
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.header4}>Dart {props.throwObject.throw}</Text>
-            <Picker
-              selectedValue={selectedMultiplier}
-              style={{ height: 50, width: 150 }}
-              mode='dropdown'
-              onValueChange={(itemValue, itemIndex) => setSelectedMultiplier(itemValue)}
-            >
-              <Picker.Item label="Single" value="1"/>
-              <Picker.Item label="Double" value="2" />
-              <Picker.Item label="Triple" value="3" />
-            </Picker>
-
-            <SwipePicker
-              items={get_fields()}
-              initialSelectedIndex={10}
-              onChange={({ item }) => {
-                var value = item.value
-                setSelectedField(value)
-              }}
-              height={ 80 }
-              width={ 150 }
-            />
+            <View style={styles.multiSelector}>
+              {elements}
+            </View>
+            <View style={styles.picker}>
+              <SwipePicker
+                items={get_fields()}
+                initialSelectedIndex={10}
+                onChange={({ item }) => {
+                  var value = item.value
+                  setSelectedField(value)
+                }}
+                height={ 80 }
+                width={ 150 }
+              />
+            </View>
 
             <View style={styles.buttonList}>
               <Pressable
@@ -205,5 +217,16 @@ const styles = StyleSheet.create({
     margin: 10,
     justifyContent: "space-around",
     flexDirection: "row",
-  }
+  },
+  multiSelector: {
+    margin: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  selectorElem: {
+    padding: 10,
+    elevation: 1,
+    margin: 0,
+    backgroundColor: colors.primary,
+  },
 });

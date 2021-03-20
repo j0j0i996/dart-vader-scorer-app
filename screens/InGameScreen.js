@@ -15,13 +15,14 @@ import gameHandler  from "../games/index.js";
 import { EventRegister } from "react-native-event-listeners";
 import { NativeEventEmitter, NativeModules } from "react-native";
 import ConnectedComponent from "../components/ConnectedComponent";
+import socketIOClient from 'socket.io-client'
 
 const playerArray = [
   {
     name: "Jonathan",
   },
   {
-    name: "Peter",
+    name: "Suppel",
   },
 ];
 
@@ -35,6 +36,8 @@ const gameInitObj = {
 
 let game_handler = new gameHandler(gameInitObj);
 
+const SOCKET_SERVER_URL = "http://192.168.0.10:3000"
+
 export default class InGameScreen extends React.Component {
 
   constructor(props) {
@@ -46,56 +49,33 @@ export default class InGameScreen extends React.Component {
       connected: false,
      };
 
-     this.connect()
+     //this.connect()
      console.log('constructed')
   }
 
-  connect() {
-
-    //set_conn(false)
-    var ws = new WebSocket('ws://192.168.0.100:8765');
-    var self = this
-
-    ws.onopen = () => {
-      // connection opened
-      ws.send('greetings'); // send a message
-      console.log('Connection established')
-      self.setState({connected: true})
-    };
-
-    ws.onclose = (e) => {
-      // connection closed
-      console.log('onclose')
-      console.log(this.state.connected)
-      if (self.state.connected) {
-        //console.log('ALERT')
-        alert('Connection to board lost')
-      }
-      
-      self.setState({connected: false})
-      setTimeout(function() {
-        self.connect();
-      }, 1000);
-    };
-
-    ws.onmessage = (e) => {
-      // a message was received
-      console.log('message received')
-      var res = e.data
-      var obj = JSON.parse(res)
-      console.log(res);
-  
-      game_handler.onGameEvent(obj.nextPlayer, obj.field, obj.multiplier)
-      self.setState({gameState: game_handler.get_gameState()})
-      self.setState({throwState: game_handler.get_throwState()})
-    };
-
-    ws.onerror = (e) => {
-      // an error occurred
-      console.log('error')
-      console.log(e.message);
-      ws.close()
-    };
+  componentDidMount() {
+    this.socket = socketIOClient(SOCKET_SERVER_URL)
+    this.socket.on('connect', () => {
+      this.setState({connected: true})
+      this.socket.emit('start_dect','')
+    })
+    this.socket.on('message', () => {
+      console.log('message')
+      //alert('message')
+    })
+    this.socket.on('dart', (res) => {
+      console.log('received')
+      console.log(res.nextPlayer)
+      var data = JSON.parse(res)
+      game_handler.onGameEvent(data.nextPlayer, data.field, data.multiplier)
+      this.setState({gameState: game_handler.get_gameState()})
+      this.setState({throwState: game_handler.get_throwState()})
+    })
+    this.socket.on('disconnect', () => {
+      //this.socket.emit('echo', 'hello')
+      this.setState({connected: false})
+      alert('Connection to board lost')
+    })
   }
 
   corr_handler(throw_idx, multiplier, field) {

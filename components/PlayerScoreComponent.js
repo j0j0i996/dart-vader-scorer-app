@@ -88,7 +88,7 @@ function StatsView(props) {
         data={props.stats}
         renderItem={renderItem}
         keyExtractor={(item) => item.k}
-        listKey={"12"}
+        listKey={"123"}
       />
     </View>
   );

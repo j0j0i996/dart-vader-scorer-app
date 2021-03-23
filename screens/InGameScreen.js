@@ -1,28 +1,18 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  FlatList,
-  Platform,
-} from "react-native";
+import { StyleSheet, Text, View, Button, FlatList, Platform,} from "react-native";
 import colors from "../config/colors";
 import PlayerScoreComponent from "../components/PlayerScoreComponent";
-import { render } from "react-dom";
 import LiveDartsComponent from "../components/LiveDartsComponent";
 import gameHandler  from "../games/index.js";
-import { EventRegister } from "react-native-event-listeners";
-import { NativeEventEmitter, NativeModules } from "react-native";
 import ConnectedComponent from "../components/ConnectedComponent";
-import socketIOClient from 'socket.io-client'
+import { Socket } from "../interfaces/socket"
 
 const playerArray = [
   {
     name: "Jonathan",
   },
   {
-    name: "Suppel",
+    name: "Sophie",
   },
 ];
 
@@ -35,9 +25,6 @@ const gameInitObj = {
 };
 
 let game_handler = new gameHandler(gameInitObj);
-
-const SOCKET_SERVER_URL = "http://192.168.0.10:3000"
-
 export default class InGameScreen extends React.Component {
 
   constructor(props) {
@@ -48,35 +35,37 @@ export default class InGameScreen extends React.Component {
       throwState: game_handler.get_throwState(),
       connected: false,
      };
-
-     //this.connect()
-     console.log('constructed')
   }
 
   componentDidMount() {
-    this.socket = socketIOClient(SOCKET_SERVER_URL)
-    this.socket.on('connect', () => {
-      this.setState({connected: true})
-      this.socket.emit('start_dect','')
+    //this.socket = new SocketGame(game_handler)
+    this.socket = new Socket()
+
+    this.socket.sio.on('connect', () => {
+      console.log('Outside')
+      this.connected = true
+      this.setState({connected: true});
+      this.socket.sio.emit('start_dect','')
     })
-    this.socket.on('message', () => {
-      console.log('message')
-      //alert('message')
+    this.socket.sio.on('disconnect', () => {
+        //this.socket.emit('echo', 'hello')
+        this.connected = false
+        this.setState({connected: false});
+        alert('Connection to board lost')
     })
-    this.socket.on('dart', (res) => {
-      console.log('received')
-      console.log(res.nextPlayer)
-      var data = JSON.parse(res)
-      game_handler.onGameEvent(data.nextPlayer, data.field, data.multiplier)
-      this.setState({gameState: game_handler.get_gameState()})
-      this.setState({throwState: game_handler.get_throwState()})
-    })
-    this.socket.on('disconnect', () => {
-      //this.socket.emit('echo', 'hello')
-      this.setState({connected: false})
-      alert('Connection to board lost')
+    this.socket.sio.on('dart', (res) => {
+      console.log('received');
+      var data = JSON.parse(res);
+      game_handler.onGameEvent(data.nextPlayer, data.field, data.multiplier);
+      this.setState({gameState: game_handler.get_gameState()});
+      this.setState({throwState: game_handler.get_throwState()});
     })
   }
+
+  //componentWillUnmount() {
+    //this.socket.removeAllListeners("dart");
+    //console.log('dart listener unregistered');
+  //}
 
   corr_handler(throw_idx, multiplier, field) {
     console.log('Field: ' + field)
@@ -91,7 +80,6 @@ export default class InGameScreen extends React.Component {
     };
     
     game_handler.correct_score(throw_idx, multiplier, field)
-    console.log(this)
     this.setState({gameState: game_handler.get_gameState()})
     this.setState({throwState: game_handler.get_throwState()})
 

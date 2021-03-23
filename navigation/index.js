@@ -6,7 +6,7 @@ import NotFoundScreen from "../screens/NotFoundScreen";
 
 const Stack = createStackNavigator();
 
-export default function Navigation() {
+export default function Navigation(props) {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>

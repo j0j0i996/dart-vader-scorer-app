@@ -24,15 +24,16 @@ const gameInitObj = {
   params: params,
 };
 
-let game_handler = new gameHandler(gameInitObj);
 export default class InGameScreen extends React.Component {
 
   constructor(props) {
     super(props);
-    // Don't call this.setState() here!
+    console.log(props.route.params)
+    this.game_handler = new gameHandler(props.route.params.gameInitObj);
+
     this.state = { 
-      gameState: game_handler.get_gameState(),
-      throwState: game_handler.get_throwState(),
+      gameState: this.game_handler.get_gameState(),
+      throwState: this.game_handler.get_throwState(),
       connected: false,
      };
   }
@@ -56,9 +57,9 @@ export default class InGameScreen extends React.Component {
     this.socket.sio.on('dart', (res) => {
       console.log('received');
       var data = JSON.parse(res);
-      game_handler.onGameEvent(data.nextPlayer, data.field, data.multiplier);
-      this.setState({gameState: game_handler.get_gameState()});
-      this.setState({throwState: game_handler.get_throwState()});
+      this.game_handler.onGameEvent(data.nextPlayer, data.field, data.multiplier);
+      this.setState({gameState: this.game_handler.get_gameState()});
+      this.setState({throwState: this.game_handler.get_throwState()});
     })
   }
 
@@ -79,9 +80,9 @@ export default class InGameScreen extends React.Component {
       return false
     };
     
-    game_handler.correct_score(throw_idx, multiplier, field)
-    this.setState({gameState: game_handler.get_gameState()})
-    this.setState({throwState: game_handler.get_throwState()})
+    this.game_handler.correct_score(throw_idx, multiplier, field)
+    this.setState({gameState: this.game_handler.get_gameState()})
+    this.setState({throwState: this.game_handler.get_throwState()})
 
     return true
   }

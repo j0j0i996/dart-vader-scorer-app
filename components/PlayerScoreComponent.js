@@ -11,7 +11,7 @@ export default function PlayerScoreComponent(props) {
       <NameView name={props.name} active={props.active} />
       <ScoreBoardView scoreBoard={props.scoreBoard} />
       <RemainingView remaining={props.remaining} />
-      <StatsView stats={props.stats} />
+      <StatsView stats={props.stats} id={props.id} />
     </View>
   );
 }
@@ -57,8 +57,7 @@ function ScoreBoardView(props) {
         horizontal={true}
         data={props.scoreBoard}
         renderItem={renderItem}
-        keyExtractor={(item) => item.k}
-        listKey={"11"}
+        listKey={item => item.k}
       />
     </View>
   );
@@ -86,9 +85,8 @@ function StatsView(props) {
       <FlatList
         horizontal={false}
         data={props.stats}
+        listKey={item => item.k}
         renderItem={renderItem}
-        keyExtractor={(item) => item.k}
-        listKey={"123"}
       />
     </View>
   );

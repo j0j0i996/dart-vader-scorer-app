@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Modal, Pressable, Button, TouchableOpacity, TouchableWithoutFeedback, ScrollView} from "react-native";
-import {Picker} from '@react-native-picker/picker';
+import { StyleSheet, Text, View, Modal, Pressable, FlatList,} from "react-native";
 import colors from "../config/colors";
 import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
 import SwipePicker from 'react-native-swipe-picker'
-import RNPickerSelect from 'react-native-picker-select';
-
-//import DynamicallySelectedPicker from 'react-native-dynamically-selected-picker';
-//import {LinearGradient} from 'expo-linear-gradient'
 
 export default function LiveDartsComponent(props) {
+
+  let items = [props.throwObject.first, props.throwObject.second, props.throwObject.third];
+  let itemList=[]
+
+  console.log(items)
+
+  items.forEach((item,index)=>{
+    itemList.push( <SingleDartView throwObject={item} corr_handler={props.corr_handler} key={index}/>)
+  })
+
   return (
     <View style={styles.container}>
-      <SingleDartView throwObject={props.throwObject.first} corr_handler={props.corr_handler}/>
-      <SingleDartView throwObject={props.throwObject.second} corr_handler={props.corr_handler}/>
-      <SingleDartView throwObject={props.throwObject.third} corr_handler={props.corr_handler}/>
+      {itemList}
     </View>
   );
 }
@@ -25,7 +28,7 @@ function SingleDartView(props) {
   const [selectedMultiplier, setSelectedMultiplier] = useState('1');
   const [selectedField, setSelectedField] = useState('10');
 
-  function MultiSelector(props) {
+  function MultiSelectorItem(props) {
     return (
       <Pressable
                 style={[styles.selectorElem, selectedMultiplier == props.value ? {backgroundColor: colors.primary} : {backgroundColor: colors.white}]}
@@ -36,10 +39,10 @@ function SingleDartView(props) {
   }
 
   var multipliers = [["Single","1"],["Double","2"],["Triple","3"]];
-  var elements=[];
+  var multi_selector=[];
 
   for(var i=0;i<multipliers.length;i++){
-    elements.push(<MultiSelector label={multipliers[i][0]} value={multipliers[i][1]}/>);
+    multi_selector.push(<MultiSelectorItem label={multipliers[i][0]} value={multipliers[i][1]} key={props.throwObject.id + i}/>);
   }
 
   return (
@@ -67,7 +70,7 @@ function SingleDartView(props) {
           <View style={styles.modalView}>
             <Text style={styles.header4}>Dart {props.throwObject.throw}</Text>
             <View style={styles.multiSelector}>
-              {elements}
+              {multi_selector}
             </View>
             <View style={styles.picker}>
               <SwipePicker
@@ -142,7 +145,7 @@ function get_fields() {
 
 const styles = StyleSheet.create({
   container: {
-    //flex:0.4,
+    //flex: 1,
     margin: 10,
     justifyContent: "space-around",
     flexDirection: "row",
@@ -151,7 +154,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     margin: 10,
-    alignItems: "stretch",
+    alignSelf: "stretch",
     borderRadius: 15,
     backgroundColor: colors.lightgray,
   },

@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Icon } from "react-native-elements";
 import InGameScreen from "../screens/InGameScreen";
 import CalibrationScreen from "../screens/CalibrationScreen";
+import GameSelectionScreen from "../screens/GameSelectionScreen";
 import colors from "../config/colors";
 
 const BottomTab = createBottomTabNavigator();
@@ -49,7 +50,12 @@ function GameTabNavigator() {
   return (
     <GameTabStack.Navigator>
       <GameTabStack.Screen
-        name="GameTabScreen"
+        name="GameSelectionScreen"
+        component={GameSelectionScreen}
+        options={{ headerTitle: "Game Selection" }}
+      />
+      <GameTabStack.Screen
+        name="InGameScreen"
         component={InGameScreen}
         options={{ headerTitle: "Game" }}
       />

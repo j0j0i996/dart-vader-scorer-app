@@ -57,7 +57,7 @@ function ScoreBoardView(props) {
         horizontal={true}
         data={props.scoreBoard}
         renderItem={renderItem}
-        listKey={item => item.k}
+        listKey={(item) => item.k}
       />
     </View>
   );
@@ -85,7 +85,7 @@ function StatsView(props) {
       <FlatList
         horizontal={false}
         data={props.stats}
-        listKey={item => item.k}
+        listKey={(item) => item.k}
         renderItem={renderItem}
       />
     </View>

@@ -7,14 +7,13 @@ import {
   Button,
   FlatList,
   TextInput,
+  Switch,
 } from "react-native";
 
 import colors from "../config/colors";
 import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
 import MultiSelectorComponent from "../components/MultiSelectorComponent";
-
-const params = { startscore: 501, sets4win: 1, legs4set: 3, doubleOut: true };
 
 export default class GameSelectionScreen extends React.Component {
   constructor(props) {
@@ -24,6 +23,9 @@ export default class GameSelectionScreen extends React.Component {
     this.state = {
       players: [{ name: "", key: 0 }],
       startscore: 501,
+      first_to: "1",
+      win_crit: "Leg",
+      doubleOut: true,
     };
   }
 
@@ -69,6 +71,12 @@ export default class GameSelectionScreen extends React.Component {
   }
 
   getGameInitObj() {
+    const params = {
+      startscore: this.state.startscore,
+      sets4win: 1,
+      legs4set: 3,
+      doubleOut: true,
+    };
     var gameInitObj = {
       gameType: "x01",
       playerArray: this.state.players,
@@ -78,8 +86,19 @@ export default class GameSelectionScreen extends React.Component {
   }
 
   handleStartscoreChange(new_startscore) {
-    console.log(new_startscore);
     this.setState({ startscore: new_startscore });
+  }
+
+  handleFirstToChange(number) {
+    this.setState({ first_to: number });
+  }
+
+  handleWinCritChange(win_crit) {
+    this.setState({ win_crit: win_crit });
+  }
+
+  handleDoubleOutChange(double_out) {
+    this.setState({ double_out: double_out });
   }
 
   render() {
@@ -106,17 +125,55 @@ export default class GameSelectionScreen extends React.Component {
           <View style={styles.horizontal_box}>
             <View style={styles.text_box}>
               <Text style={styles.header4}>STARTSCORE</Text>
-              <MultiSelectorComponent
-                data={[
-                  { label: "101", value: 101 },
-                  { label: "301", value: 301 },
-                  { label: "501", value: 501 },
-                  { label: "701", value: 701 },
-                ]}
-                onChange={this.handleStartscoreChange.bind(this)}
-                default={this.state.startscore}
+            </View>
+          </View>
+          <MultiSelectorComponent
+            data={[
+              { label: "101", value: 101 },
+              { label: "301", value: 301 },
+              { label: "501", value: 501 },
+              { label: "701", value: 701 },
+            ]}
+            onChange={this.handleStartscoreChange.bind(this)}
+            default={this.state.startscore}
+          />
+          <View style={styles.horizontal_box}>
+            <View style={styles.text_box}>
+              <Text style={styles.header4}>FIRST TO</Text>
+            </View>
+          </View>
+          <View style={styles.horizontal_box}>
+            <View style={{ flex: 0.5 }}>
+              <TextInput
+                style={styles.numberInput}
+                onChangeText={(text) => this.handleFirstToChange(text)}
+                value={this.state.first_to}
+                maxLength={2}
+                keyboardType="numeric"
+                textAlign="center"
               />
             </View>
+            <View style={{ flex: 0.5 }}>
+              <MultiSelectorComponent
+                data={[
+                  { label: "Sets", value: "Set" },
+                  { label: "Legs", value: "Leg" },
+                ]}
+                onChange={this.handleWinCritChange.bind(this)}
+                default={this.state.win_crit}
+              />
+            </View>
+          </View>
+          <View style={styles.horizontal_box}>
+            <View style={styles.text_box}>
+              <Text style={styles.header4}>DOUBLE OUT</Text>
+            </View>
+            <Switch
+              trackColor={{ false: "#767577", true: "#81b0ff" }}
+              thumbColor={this.state.doubleOut ? "#f5dd4b" : "#f4f3f4"}
+              onValueChange={this.handleDoubleOutChange}
+              value={this.state.doubleOut}
+            />
           </View>
         </View>
         <Pressable
@@ -181,5 +238,13 @@ const styles = StyleSheet.create({
   header4: {
     ...Typography.header4,
     color: colors.gray,
+  },
+  numberInput: {
+    //...Typography.header4,
+    backgroundColor: colors.white,
+    padding: 5,
+    margin: 11,
+    borderWidth: 1,
+    //borderColor: colors.background2,
   },
 });

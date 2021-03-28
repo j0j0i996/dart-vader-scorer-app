@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import { onChange } from "react-native-reanimated";
 import colors from "../config/colors";
+import { Typography } from "../styles";
 
-export default function MultiSelectorComponent2(props) {
+export default function MultiSelectorComponent(props) {
   const [selectedValue, setSelectedValue] = useState(props.default);
 
   const handleChange = (value) => {
@@ -24,10 +25,9 @@ export default function MultiSelectorComponent2(props) {
       >
         <Text
           style={
-            (styles.text,
             selectedValue == props.value
               ? { color: colors.white }
-              : { color: colors.primary })
+              : { color: colors.primary }
           }
         >
           {props.label}
@@ -46,48 +46,19 @@ export default function MultiSelectorComponent2(props) {
   return <View style={styles.multiSelector}>{multi_selector}</View>;
 }
 
-export function MultiSelectorComponent(props) {
-  const [selectedValue, setSelectedValue] = useState(0);
-
-  function MultiSelectorItem(props) {
-    return (
-      <Text
-        style={
-          (styles.text,
-          selectedValue == props.value
-            ? { color: colors.white }
-            : { color: colors.primary })
-        }
-      >
-        {props.label}
-      </Text>
-    );
-  }
-
-  var multi_selector = [];
-  props.data.forEach((item, index) => {
-    console.log("HALO");
-    console.log(item.value);
-  });
-
-  return (
-    <View style={styles.multiSelector}>
-      <Text>Hallo</Text>
-      <MultiSelectorItem label={"Hi"} value={3} key={1} />
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   multiSelector: {
     margin: 10,
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
   },
   selectorElem: {
+    flex: 1,
     padding: 10,
-    elevation: 1,
     margin: 0,
+    borderWidth: 1,
+    borderColor: colors.background2,
     backgroundColor: colors.primary,
+    alignItems: "center",
   },
 });

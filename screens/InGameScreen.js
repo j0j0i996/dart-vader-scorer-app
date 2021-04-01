@@ -1,90 +1,92 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Button, FlatList, Platform,} from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  FlatList,
+  Platform,
+} from "react-native";
 import colors from "../config/colors";
 import PlayerScoreComponent from "../components/PlayerScoreComponent";
 import LiveDartsComponent from "../components/LiveDartsComponent";
-import gameHandler  from "../games/index.js";
+import gameHandler from "../games/index.js";
 import ConnectedComponent from "../components/ConnectedComponent";
-import { Socket } from "../interfaces/socket"
-
-const playerArray = [
-  {
-    name: "Jonathan",
-  },
-  {
-    name: "Sophie",
-  },
-];
-
-const params = { startscore: 501, sets4win: 1, legs4set: 3, doubleOut: true };
-
-const gameInitObj = {
-  gameType: "x01",
-  playerArray: playerArray,
-  params: params,
-};
-
+import { Socket } from "../interfaces/socket";
 export default class InGameScreen extends React.Component {
-
   constructor(props) {
     super(props);
-    console.log(props.route.params)
-    this.game_handler = new gameHandler(props.route.params.gameInitObj);
+    this.gameInitObj = props.route.params.gameInitObj;
+    this.navigation = props.navigation;
 
-    this.state = { 
+    this.game_handler = new gameHandler(this.gameInitObj);
+
+    this.state = {
       gameState: this.game_handler.get_gameState(),
       throwState: this.game_handler.get_throwState(),
       connected: false,
-     };
+    };
   }
 
   componentDidMount() {
     //this.socket = new SocketGame(game_handler)
-    this.socket = new Socket()
 
-    this.socket.sio.on('connect', () => {
-      console.log('Outside')
-      this.connected = true
-      this.setState({connected: true});
-      this.socket.sio.emit('start_dect','')
-    })
-    this.socket.sio.on('disconnect', () => {
-        //this.socket.emit('echo', 'hello')
-        this.connected = false
-        this.setState({connected: false});
-        alert('Connection to board lost')
-    })
-    this.socket.sio.on('dart', (res) => {
-      console.log('received');
+    this.navigation.setOptions({
+      headerTitle:
+        this.gameInitObj.params.startscore +
+        " | First to " +
+        this.gameInitObj.params.first_to +
+        " " +
+        this.gameInitObj.params.win_crit,
+    });
+
+    this.socket = new Socket();
+
+    this.socket.sio.on("connect", () => {
+      this.connected = true;
+      this.setState({ connected: true });
+      this.socket.sio.emit("start_dect", "");
+    });
+    this.socket.sio.on("disconnect", () => {
+      //this.socket.emit('echo', 'hello')
+      this.connected = false;
+      this.setState({ connected: false });
+      alert("Connection to board lost");
+    });
+    this.socket.sio.on("dart", (res) => {
       var data = JSON.parse(res);
-      this.game_handler.onGameEvent(data.nextPlayer, data.field, data.multiplier);
-      this.setState({gameState: this.game_handler.get_gameState()});
-      this.setState({throwState: this.game_handler.get_throwState()});
-    })
+      this.game_handler.onGameEvent(
+        data.nextPlayer,
+        data.field,
+        data.multiplier
+      );
+      this.setState({ gameState: this.game_handler.get_gameState() });
+      this.setState({ throwState: this.game_handler.get_throwState() });
+    });
   }
 
   //componentWillUnmount() {
-    //this.socket.removeAllListeners("dart");
-    //console.log('dart listener unregistered');
+  //this.socket.removeAllListeners("dart");
+  //console.log('dart listener unregistered');
   //}
 
   corr_handler(throw_idx, multiplier, field) {
-    console.log('Field: ' + field)
-    throw_idx = parseInt(throw_idx)
-    multiplier = parseInt(multiplier)
-    field = parseInt(field)
-  
-    var score = multiplier * field
-    if (score > 60) {
-      alert("Nice try :) \nScore over 60 not possible.")
-      return false
-    };
-    
-    this.game_handler.correct_score(throw_idx, multiplier, field)
-    this.setState({gameState: this.game_handler.get_gameState()})
-    this.setState({throwState: this.game_handler.get_throwState()})
+    console.log("Field: " + field);
+    throw_idx = parseInt(throw_idx);
+    multiplier = parseInt(multiplier);
+    field = parseInt(field);
 
-    return true
+    var score = multiplier * field;
+    if (score > 60) {
+      alert("Nice try :) \nScore over 60 not possible.");
+      return false;
+    }
+
+    this.game_handler.correct_score(throw_idx, multiplier, field);
+    this.setState({ gameState: this.game_handler.get_gameState() });
+    this.setState({ throwState: this.game_handler.get_throwState() });
+
+    return true;
   }
 
   renderPlayerItem = ({ item }) => (
@@ -101,7 +103,7 @@ export default class InGameScreen extends React.Component {
         active={item.active}
       />
     </View>
-  )
+  );
 
   render() {
     return (
@@ -114,13 +116,16 @@ export default class InGameScreen extends React.Component {
             listKey={"1"}
           />
         </View>
-        <LiveDartsComponent throwObject={this.state.throwState} corr_handler={this.corr_handler.bind(this)} />
+        <LiveDartsComponent
+          throwObject={this.state.throwState}
+          corr_handler={this.corr_handler.bind(this)}
+        />
         <View style={styles.bottomBar}>
-          <ConnectedComponent connected={this.state.connected}/>
+          <ConnectedComponent connected={this.state.connected} />
         </View>
       </View>
     );
-  };
+  }
 }
 
 const styles = StyleSheet.create({
@@ -149,8 +154,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   bottomBar: {
-    flexDirection: 'row',
-    position: 'absolute',
+    flexDirection: "row",
+    position: "absolute",
     bottom: 0,
     backgroundColor: colors.white,
     paddingHorizontal: 10,

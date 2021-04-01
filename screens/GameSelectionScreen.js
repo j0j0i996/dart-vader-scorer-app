@@ -4,16 +4,19 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   FlatList,
   TextInput,
   Switch,
+  LogBox,
 } from "react-native";
 
 import colors from "../config/colors";
 import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
 import MultiSelectorComponent from "../components/MultiSelectorComponent";
+import { ScrollView } from "react-native-gesture-handler";
+
+LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
 export default class GameSelectionScreen extends React.Component {
   constructor(props) {
@@ -57,7 +60,11 @@ export default class GameSelectionScreen extends React.Component {
 
   addPlayer() {
     let players = this.state.players;
-    players.push({ key: players[players.length - 1].key + 1 });
+    if (players.length == 0) {
+      players.push({ key: 0 });
+    } else {
+      players.push({ key: players[players.length - 1].key + 1 });
+    }
     this.setState({ players });
   }
 
@@ -73,9 +80,9 @@ export default class GameSelectionScreen extends React.Component {
   getGameInitObj() {
     const params = {
       startscore: this.state.startscore,
-      sets4win: 1,
-      legs4set: 3,
-      doubleOut: true,
+      first_to: this.state.first_to,
+      win_crit: this.state.win_crit,
+      doubleOut: this.state.doubleOut,
     };
     var gameInitObj = {
       gameType: "x01",
@@ -85,108 +92,113 @@ export default class GameSelectionScreen extends React.Component {
     return gameInitObj;
   }
 
-  handleStartscoreChange(new_startscore) {
-    this.setState({ startscore: new_startscore });
+  handleStartscoreChange(val) {
+    this.setState({ startscore: val });
   }
 
-  handleFirstToChange(number) {
-    this.setState({ first_to: number });
+  handleFirstToChange(val) {
+    this.setState({ first_to: val });
   }
 
   handleWinCritChange(win_crit) {
     this.setState({ win_crit: win_crit });
   }
 
-  handleDoubleOutChange(double_out) {
-    this.setState({ double_out: double_out });
+  handleDoubleOutChange(val) {
+    this.setState({ doubleOut: val });
   }
 
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.selectionGroup}>
-          <View style={styles.horizontal_box}>
-            <View style={styles.text_box}>
-              <Text style={styles.header4}>PLAYERS</Text>
-            </View>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.container}>
+          <View style={styles.selectionGroup}>
+            <View style={styles.horizontal_box}>
+              <View style={styles.text_box}>
+                <Text style={styles.header4}>PLAYERS</Text>
+              </View>
 
-            <Pressable style={styles.button} onPress={() => this.addPlayer()}>
-              <Text style={styles.small_text}>ADD PLAYER</Text>
-            </Pressable>
-          </View>
-          <FlatList
-            numColumns={1}
-            data={this.state.players}
-            renderItem={this.renderPlayerItem}
-            listKey={(item) => item.key}
-          />
-        </View>
-        <View style={styles.selectionGroup}>
-          <View style={styles.horizontal_box}>
-            <View style={styles.text_box}>
-              <Text style={styles.header4}>STARTSCORE</Text>
+              <Pressable style={styles.button} onPress={() => this.addPlayer()}>
+                <Text style={styles.small_text}>ADD PLAYER</Text>
+              </Pressable>
             </View>
-          </View>
-          <MultiSelectorComponent
-            data={[
-              { label: "101", value: 101 },
-              { label: "301", value: 301 },
-              { label: "501", value: 501 },
-              { label: "701", value: 701 },
-            ]}
-            onChange={this.handleStartscoreChange.bind(this)}
-            default={this.state.startscore}
-          />
-          <View style={styles.horizontal_box}>
-            <View style={styles.text_box}>
-              <Text style={styles.header4}>FIRST TO</Text>
-            </View>
-          </View>
-          <View style={styles.horizontal_box}>
-            <View style={{ flex: 0.5 }}>
-              <TextInput
-                style={styles.numberInput}
-                onChangeText={(text) => this.handleFirstToChange(text)}
-                value={this.state.first_to}
-                maxLength={2}
-                keyboardType="numeric"
-                textAlign="center"
-              />
-            </View>
-            <View style={{ flex: 0.5 }}>
-              <MultiSelectorComponent
-                data={[
-                  { label: "Sets", value: "Set" },
-                  { label: "Legs", value: "Leg" },
-                ]}
-                onChange={this.handleWinCritChange.bind(this)}
-                default={this.state.win_crit}
-              />
-            </View>
-          </View>
-          <View style={styles.horizontal_box}>
-            <View style={styles.text_box}>
-              <Text style={styles.header4}>DOUBLE OUT</Text>
-            </View>
-            <Switch
-              trackColor={{ false: "#767577", true: "#81b0ff" }}
-              thumbColor={this.state.doubleOut ? "#f5dd4b" : "#f4f3f4"}
-              onValueChange={this.handleDoubleOutChange}
-              value={this.state.doubleOut}
+            <FlatList
+              numColumns={1}
+              data={this.state.players}
+              renderItem={this.renderPlayerItem}
+              listKey={(item) => item.key}
             />
           </View>
+          <View style={styles.selectionGroup}>
+            <View style={styles.horizontal_box}>
+              <View style={styles.text_box}>
+                <Text style={styles.header4}>STARTSCORE</Text>
+              </View>
+            </View>
+            <MultiSelectorComponent
+              data={[
+                { label: "101", value: 101 },
+                { label: "301", value: 301 },
+                { label: "501", value: 501 },
+                { label: "701", value: 701 },
+              ]}
+              onChange={this.handleStartscoreChange.bind(this)}
+              default={this.state.startscore}
+            />
+            <View style={styles.horizontal_box}>
+              <View style={styles.text_box}>
+                <Text style={styles.header4}>FIRST TO</Text>
+              </View>
+            </View>
+            <View style={styles.horizontal_box}>
+              <View style={{ flex: 0.5 }}>
+                <TextInput
+                  style={styles.numberInput}
+                  onChangeText={(text) => this.handleFirstToChange(text)}
+                  value={this.state.first_to}
+                  maxLength={2}
+                  keyboardType="numeric"
+                  textAlign="center"
+                />
+              </View>
+              <View style={{ flex: 0.5 }}>
+                <MultiSelectorComponent
+                  data={[
+                    { label: "Sets", value: "Set" },
+                    { label: "Legs", value: "Leg" },
+                  ]}
+                  onChange={this.handleWinCritChange.bind(this)}
+                  default={this.state.win_crit}
+                />
+              </View>
+            </View>
+            <View style={styles.horizontal_box}>
+              <View style={styles.text_box}>
+                <Text style={styles.header4}>DOUBLE OUT</Text>
+              </View>
+              <Switch
+                trackColor={{ false: colors.lightgray, true: colors.primary }}
+                thumbColor={this.state.doubleOut ? colors.white : colors.white}
+                onValueChange={this.handleDoubleOutChange.bind(this)}
+                value={this.state.doubleOut}
+                style={{ transform: [{ scaleX: 1.1 }, { scaleY: 1.1 }] }}
+              />
+            </View>
+          </View>
+          <View style={styles.final_button}>
+            <Pressable
+              style={styles.button}
+              onPress={() =>
+                this.navigation.navigate("InGameScreen", {
+                  gameInitObj: this.getGameInitObj(),
+                })
+              }
+            >
+              <Text style={styles.text}>CONTINUE</Text>
+            </Pressable>
+          </View>
         </View>
-        <Pressable
-          style={styles.button}
-          onPress={() =>
-            this.navigation.navigate("InGameScreen", {
-              gameInitObj: this.getGameInitObj(),
-            })
-          }
-        >
-          <Text style={styles.small_text}>CONTINUE</Text>
-        </Pressable>
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -194,10 +206,11 @@ export default class GameSelectionScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background1,
     flexDirection: "column",
-    alignItems: "stretch",
     justifyContent: "flex-start",
+  },
+  scrollView: {
+    backgroundColor: colors.background1,
   },
   selectionGroup: {
     borderRadius: 10,
@@ -228,8 +241,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: "center",
   },
+  final_button: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
   small_text: {
     ...Typography.small_text,
+    color: colors.white,
+  },
+  text: {
+    ...Typography.text,
     color: colors.white,
   },
   text_box: {
@@ -240,11 +262,9 @@ const styles = StyleSheet.create({
     color: colors.gray,
   },
   numberInput: {
-    //...Typography.header4,
     backgroundColor: colors.white,
     padding: 5,
     margin: 11,
     borderWidth: 1,
-    //borderColor: colors.background2,
   },
 });

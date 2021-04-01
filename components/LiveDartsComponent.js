@@ -1,46 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Modal, Pressable, Button, TouchableOpacity, TouchableWithoutFeedback, ScrollView} from "react-native";
-import {Picker} from '@react-native-picker/picker';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Modal,
+  Pressable,
+  FlatList,
+} from "react-native";
 import colors from "../config/colors";
 import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
-import SwipePicker from 'react-native-swipe-picker'
-import RNPickerSelect from 'react-native-picker-select';
-
-//import DynamicallySelectedPicker from 'react-native-dynamically-selected-picker';
-//import {LinearGradient} from 'expo-linear-gradient'
+import SwipePicker from "react-native-swipe-picker";
+import MultiSelectorComponent from "../components/MultiSelectorComponent";
 
 export default function LiveDartsComponent(props) {
-  return (
-    <View style={styles.container}>
-      <SingleDartView throwObject={props.throwObject.first} corr_handler={props.corr_handler}/>
-      <SingleDartView throwObject={props.throwObject.second} corr_handler={props.corr_handler}/>
-      <SingleDartView throwObject={props.throwObject.third} corr_handler={props.corr_handler}/>
-    </View>
-  );
+  let items = [
+    props.throwObject.first,
+    props.throwObject.second,
+    props.throwObject.third,
+  ];
+  let itemList = [];
+
+  console.log(items);
+
+  items.forEach((item, index) => {
+    itemList.push(
+      <SingleDartView
+        throwObject={item}
+        corr_handler={props.corr_handler}
+        key={index}
+      />
+    );
+  });
+
+  return <View style={styles.container}>{itemList}</View>;
 }
 
 function SingleDartView(props) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedMultiplier, setSelectedMultiplier] = useState('1');
-  const [selectedField, setSelectedField] = useState('10');
-
-  function MultiSelector(props) {
-    return (
-      <Pressable
-                style={[styles.selectorElem, selectedMultiplier == props.value ? {backgroundColor: colors.primary} : {backgroundColor: colors.white}]}
-                onPress={() => {setSelectedMultiplier(props.value);}}>
-        <Text style={styles.text, selectedMultiplier == props.value ? {color: colors.white} : {color: colors.primary}}>{props.label}</Text>
-      </Pressable>
-    );
-  }
-
-  var multipliers = [["Single","1"],["Double","2"],["Triple","3"]];
-  var elements=[];
-
-  for(var i=0;i<multipliers.length;i++){
-    elements.push(<MultiSelector label={multipliers[i][0]} value={multipliers[i][1]}/>);
-  }
+  const [selectedMultiplier, setSelectedMultiplier] = useState("1");
+  const [selectedField, setSelectedField] = useState("10");
 
   return (
     <View
@@ -51,34 +50,40 @@ function SingleDartView(props) {
           : { backgroundColor: colors.lightgray },
       ]}
       onPress={() => setModalVisible(true)}
-    > 
-     <Modal
+    >
+      <Modal
         animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
           Alert.alert("Modal has been closed.");
           setModalVisible(!modalVisible);
-          setSelectedField('10')
-          setSelectedMultiplier("1")
+          setSelectedField("10");
+          setSelectedMultiplier("1");
         }}
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.header4}>Dart {props.throwObject.throw}</Text>
-            <View style={styles.multiSelector}>
-              {elements}
-            </View>
+            <MultiSelectorComponent
+              data={[
+                { label: "Single", value: "1" },
+                { label: "Double", value: "2" },
+                { label: "Triple", value: "3" },
+              ]}
+              onChange={setSelectedMultiplier}
+              default={selectedMultiplier}
+            />
             <View style={styles.picker}>
               <SwipePicker
                 items={get_fields()}
                 initialSelectedIndex={10}
                 onChange={({ item }) => {
-                  var value = item.value
-                  setSelectedField(value)
+                  var value = item.value;
+                  setSelectedField(value);
                 }}
-                height={ 80 }
-                width={ 150 }
+                height={80}
+                width={150}
               />
             </View>
 
@@ -87,7 +92,7 @@ function SingleDartView(props) {
                 style={[styles.button, styles.buttonDiscard]}
                 onPress={() => {
                   setModalVisible(!modalVisible);
-                  setSelectedField('10');
+                  setSelectedField("10");
                   setSelectedMultiplier("1");
                 }}
               >
@@ -96,10 +101,14 @@ function SingleDartView(props) {
               <Pressable
                 style={[styles.button, styles.buttonSave]}
                 onPress={() => {
-                  var success = props.corr_handler(props.throwObject.throw,selectedMultiplier,selectedField);
+                  var success = props.corr_handler(
+                    props.throwObject.throw,
+                    selectedMultiplier,
+                    selectedField
+                  );
                   setModalVisible(!success);
                   if (success) {
-                    setSelectedField('10');
+                    setSelectedField("10");
                     setSelectedMultiplier("1");
                   }
                 }}
@@ -110,19 +119,18 @@ function SingleDartView(props) {
           </View>
         </View>
       </Modal>
-      
-      <Pressable
-        alignItems = "center"
-        onPress={() => setModalVisible(true)}
-      >
+
+      <Pressable alignItems="center" onPress={() => setModalVisible(true)}>
         <Text style={styles.text}>Dart {props.throwObject.throw}</Text>
         <Text style={styles.header1}>
-          {props.throwObject.score === parseInt(props.throwObject.score, 10) ? props.throwObject.score : " "}
+          {props.throwObject.score === parseInt(props.throwObject.score, 10)
+            ? props.throwObject.score
+            : " "}
         </Text>
         <Text style={styles.header3}>
           {props.throwObject.section ? props.throwObject.section : " "}
         </Text>
-        <View alignSelf = "flex-start">
+        <View alignSelf="flex-start">
           <Icon name="edit" color={colors.white} size={20} />
         </View>
       </Pressable>
@@ -134,15 +142,15 @@ function get_fields() {
   var i;
   var fields = [];
   for (i = 0; i <= 20; i++) {
-  	fields.push({value:i, label: String(i)});
+    fields.push({ value: i, label: String(i) });
   }
-  fields.push({value:25, label: String(25)})
-  return fields
+  fields.push({ value: 25, label: String(25) });
+  return fields;
 }
 
 const styles = StyleSheet.create({
   container: {
-    //flex:0.4,
+    //flex: 1,
     margin: 10,
     justifyContent: "space-around",
     flexDirection: "row",
@@ -151,7 +159,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     margin: 10,
-    alignItems: "stretch",
+    alignSelf: "stretch",
     borderRadius: 15,
     backgroundColor: colors.lightgray,
   },
@@ -183,9 +191,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 0
+    marginTop: 0,
   },
   modalView: {
+    width: "66%",
     margin: 0,
     backgroundColor: colors.background1,
     borderRadius: 20,
@@ -195,11 +204,11 @@ const styles = StyleSheet.create({
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 0
+      height: 0,
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 5
+    elevation: 5,
   },
   button: {
     borderRadius: 15,
@@ -220,8 +229,8 @@ const styles = StyleSheet.create({
   },
   multiSelector: {
     margin: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   selectorElem: {
     padding: 10,

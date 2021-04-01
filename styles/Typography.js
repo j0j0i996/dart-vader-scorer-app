@@ -34,3 +34,8 @@ export const text = {
   fontFamily: fontFamily,
   fontSize: 18,
 };
+
+export const small_text = {
+  fontFamily: fontFamily,
+  fontSize: 16,
+};

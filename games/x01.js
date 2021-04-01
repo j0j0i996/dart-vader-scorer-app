@@ -119,7 +119,7 @@ class Player {
     this.turn_sections[throw_idx] = false;
     this.turn_scores[throw_idx] = false;
 
-    console.log('Throw removed')
+    console.log("Throw removed");
   }
 }
 
@@ -141,8 +141,15 @@ export default class gameCls {
     this.lastSetStarter = 0;
     this.throw_idx = 0;
     this.startscore = params.startscore;
-    this.sets4win = params.sets4win;
-    this.legs4set = params.legs4set;
+
+    if (params.win_crit == "Set") {
+      this.legs4set = 3;
+      this.sets4win = params.first_to;
+    } else {
+      this.legs4set = params.first_to;
+      this.sets4win = 1;
+    }
+
     this.doubleOut = params.doubleOut;
     this.back_up = false; // in case of change operation
   }
@@ -172,7 +179,8 @@ export default class gameCls {
     this.players[this.selPlayer].thrown_in_turn = true;
     //testing
     var score = field * multiplier;
-    var section =((multiplier == 1) ? 'S' : ((multiplier == 2) ? 'D' : 'T')) + String(field)
+    var section =
+      (multiplier == 1 ? "S" : multiplier == 2 ? "D" : "T") + String(field);
 
     if (this.players[this.selPlayer].active) {
       if (this.players[this.selPlayer].remaining - score > 1) {
@@ -193,49 +201,54 @@ export default class gameCls {
   }
 
   onNextPlayer() {
-    console.log('onNextPlayer exec')
+    console.log("onNextPlayer exec");
     // only if player has thrown yet
     //console.log(this.players[this.selPlayer].thrown_in_turn)
     if (this.players[this.selPlayer].thrown_in_turn) {
       this.nextPlayer();
-      console.log('thrown_in_turn')
+      console.log("thrown_in_turn");
     }
   }
 
   correct_score(throw_idx, multiplier, field) {
     throw_idx--;
-    console.log(throw_idx) //array starts at 0
+    console.log(throw_idx); //array starts at 0
     const turn_sections = { ...this.players[this.selPlayer].turn_sections };
-    const darts_thrown_in_turn = this.throw_idx
+    const darts_thrown_in_turn = this.throw_idx;
 
-    console.log(turn_sections)
-    console.log(this.throw_idx)
+    console.log(turn_sections);
+    console.log(this.throw_idx);
 
     var i;
     for (i = 2; i >= throw_idx; i--) {
-      console.log(i)
+      console.log(i);
       if (turn_sections[i] != false) {
         this.players[this.selPlayer].remove_throw(i);
         this.throw_idx--;
       }
     }
 
-    var kvArray = [['S', 1], ['D', 2], ['T', 3]];
+    var kvArray = [
+      ["S", 1],
+      ["D", 2],
+      ["T", 3],
+    ];
     var MultiplierMap = new Map(kvArray);
 
-    console.log(turn_sections)
+    console.log(turn_sections);
     for (i = throw_idx; i < 3; i++) {
       if (i == throw_idx) {
         this.throw_idx = i;
-        this.onThrow(field, multiplier)
-      }
-      else if (turn_sections[i] != false) {
+        this.onThrow(field, multiplier);
+      } else if (turn_sections[i] != false) {
         this.throw_idx = i;
-        var field_temp = parseInt(turn_sections[i].substring(1))
-        var multiplier_temp = MultiplierMap.get(turn_sections[i].substring(0,1));
-        console.log('field: ' + field_temp)
-        console.log('multiplier: ' + multiplier_temp)
-        this.onThrow(field_temp, multiplier_temp)
+        var field_temp = parseInt(turn_sections[i].substring(1));
+        var multiplier_temp = MultiplierMap.get(
+          turn_sections[i].substring(0, 1)
+        );
+        console.log("field: " + field_temp);
+        console.log("multiplier: " + multiplier_temp);
+        this.onThrow(field_temp, multiplier_temp);
       }
     }
     //console.log(turn_sections)

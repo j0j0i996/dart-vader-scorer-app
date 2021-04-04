@@ -33,11 +33,11 @@ export default class InGameScreen extends React.Component {
 
     this.navigation.setOptions({
       headerTitle:
-        this.gameInitObj.params.startscore +
-        " | First to " +
+        "First to " +
         this.gameInitObj.params.first_to +
         " " +
-        this.gameInitObj.params.win_crit,
+        this.gameInitObj.params.win_crit +
+        (this.gameInitObj.params.first_to > 1 ? "s" : ""),
     });
 
     this.socket = new Socket();
@@ -60,6 +60,7 @@ export default class InGameScreen extends React.Component {
         data.field,
         data.multiplier
       );
+      c;
       this.setState({ gameState: this.game_handler.get_gameState() });
       this.setState({ throwState: this.game_handler.get_throwState() });
     });

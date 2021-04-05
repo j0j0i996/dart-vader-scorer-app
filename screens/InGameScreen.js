@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  FlatList,
-  Platform,
-} from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import colors from "../config/colors";
 import PlayerScoreComponent from "../components/PlayerScoreComponent";
 import LiveDartsComponent from "../components/LiveDartsComponent";
@@ -60,7 +53,6 @@ export default class InGameScreen extends React.Component {
         data.field,
         data.multiplier
       );
-      c;
       this.setState({ gameState: this.game_handler.get_gameState() });
       this.setState({ throwState: this.game_handler.get_throwState() });
     });

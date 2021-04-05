@@ -11,14 +11,28 @@ export class API {
   }
 
   async ping(msg) {
-    response = await this.service.get("/echo/" + msg);
+    var response = await this.service.get("/echo/" + msg);
     return response.data;
   }
 
   async calibration(cam_idx, closest_field) {
-    response = await this.service.patch(
-      "/calibration?cam_idx=" + cam_idx + "&closest_field=" + closest_field
-    );
-    return response.data;
+    var success = {
+      connection: null,
+      calibration: null,
+    };
+
+    var response = await this.service
+      .patch(
+        "/calibration?cam_idx=" + cam_idx + "&closest_field=" + closest_field
+      )
+      .catch(function (err) {
+        console.log(err);
+        success.connection = false;
+        return success;
+      });
+
+    success.connection = true;
+    success.calibration = response.data == "True";
+    return success;
   }
 }

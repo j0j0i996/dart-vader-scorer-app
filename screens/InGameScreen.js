@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Button,
-  FlatList,
-  Platform,
-} from "react-native";
+import { StyleSheet, Text, View, FlatList } from "react-native";
 import colors from "../config/colors";
 import PlayerScoreComponent from "../components/PlayerScoreComponent";
 import LiveDartsComponent from "../components/LiveDartsComponent";
@@ -33,11 +26,11 @@ export default class InGameScreen extends React.Component {
 
     this.navigation.setOptions({
       headerTitle:
-        this.gameInitObj.params.startscore +
-        " | First to " +
+        "First to " +
         this.gameInitObj.params.first_to +
         " " +
-        this.gameInitObj.params.win_crit,
+        this.gameInitObj.params.win_crit +
+        (this.gameInitObj.params.first_to > 1 ? "s" : ""),
     });
 
     this.socket = new Socket();

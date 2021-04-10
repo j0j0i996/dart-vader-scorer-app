@@ -106,7 +106,7 @@ export default class InGameScreen extends React.Component {
             numColumns={2}
             data={this.state.gameState}
             renderItem={this.renderPlayerItem}
-            listKey={"1"}
+            listKey={(item) => item.id}
           />
         </View>
         <LiveDartsComponent
@@ -151,7 +151,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     backgroundColor: colors.white,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
   },
 });

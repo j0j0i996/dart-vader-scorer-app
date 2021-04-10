@@ -9,4 +9,5 @@ export default {
   lightgray: "#AAAAAA",
   red: "#B53737",
   green: "#2E6930",
+  lightgreen: "#32c74a",
 };

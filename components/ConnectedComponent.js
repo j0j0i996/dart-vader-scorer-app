@@ -5,29 +5,34 @@ import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
 
 export default ConnectedComponent = (props) => {
-    //render() {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.text}>
-                    Board connection
-                </Text>
-                <Icon name={props.connected ? "check" : "close"} color={props.connected ? colors.green : colors.red} size={28} />
-            </View>
-        );
-    //}
-}
+  return (
+    <View style={styles.container}>
+      <Text
+        style={[
+          styles.text,
+          { color: props.connected ? colors.lightgreen : colors.red },
+        ]}
+      >
+        {props.connected ? "CONNECTED TO BOARD" : "NOT CONNECTED TO BOARD"}
+      </Text>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-container: {
+  container: {
     flex: 1,
-    textAlign: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignSelf: 'stretch',
-},
-text: {
-    ...Typography.text,
-    color: colors.gray,
-    alignSelf: 'stretch',
-},
+    flexDirection: "row",
+    justifyContent: "center",
+    backgroundColor: colors.white,
+    //borderTopWidth: 1,
+    //borderBottomWidth: 1,
+    borderColor: colors.lightgray,
+    paddingHorizontal: 10,
+    paddingVertical: 1,
+  },
+  text: {
+    ...Typography.small_text,
+    color: colors.white,
+  },
 });

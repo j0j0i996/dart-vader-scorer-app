@@ -21,7 +21,17 @@ var gameInitObj = {
 game = new gameCls(playerArray, params);
 
 test("uuid", () => {
-  len = game.players[0].key.length;
+  len = game.players[0].id.length;
   console.log(len);
   expect(len).toEqual(36);
+});
+
+test("game flow", () => {
+  expect(game.selPlayerIndex).toEqual(0);
+  game.onThrow(10, 1);
+  game.onThrow(10, 1);
+  game.onThrow(10, 1);
+  expect(game.players[0].remaining).toEqual(471);
+  game.onNextPlayer();
+  expect(game.selPlayerIndex).toEqual(1);
 });

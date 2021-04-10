@@ -1,7 +1,8 @@
+import { v4 as uuidv4 } from "uuid";
 class Player {
-  constructor(name, id, startscore) {
+  constructor(name, startscore) {
     this.name = name;
-    this.id = id;
+    this.id = uuidv4();
     this.startscore = startscore;
     this.remaining = this.startscore;
     this.sets = 0;
@@ -39,13 +40,25 @@ class Player {
       remaining: this.remaining,
       active: this.active,
       scoreBoard: [
-        { k: "Sets", v: this.sets },
-        { k: "Legs", v: this.legs },
+        { k: "Sets", v: this.sets, id: "81359722-a165-4ad7-b3c6-8c2f0f991dd2" },
+        { k: "Legs", v: this.legs, id: "74beedc2-b6f3-49a6-b7c2-4fd75927d524" },
       ],
       stats: [
-        { k: "Last score", v: this.last_score },
-        { k: "Darts thrown", v: this.darts_thrown_leg },
-        { k: "Average", v: this.avg },
+        {
+          k: "Last score",
+          v: this.last_score,
+          id: "9de9280f-516e-48c6-a41a-33b4a1e64b75",
+        },
+        {
+          k: "Darts thrown",
+          v: this.darts_thrown_leg,
+          id: "aab75b10-1a83-4a98-8fa5-aa2980e67c19",
+        },
+        {
+          k: "Average",
+          v: this.avg,
+          id: "be720bb8-e90a-47e0-8434-57467090846e",
+        },
       ],
     };
   }
@@ -127,16 +140,14 @@ export default class gameCls {
   constructor(playerArray, params) {
     // params = startscore, sets4win, legs4set, doubleOut
     var players = [];
-    id = 0;
     playerArray.forEach(function (item, index) {
-      let p = new Player(item.name, id, params.startscore);
+      let p = new Player(item.name, params.startscore);
       players.push(p);
-      id += 1;
     });
 
     this.players = players;
-    this.selPlayer = 0;
-    this.players[this.selPlayer].active = true;
+    this.selPlayerIndex = 0;
+    this.players[this.selPlayerIndex].active = true;
     this.lastLegStarter = 0;
     this.lastSetStarter = 0;
     this.throw_idx = 0;
@@ -164,8 +175,8 @@ export default class gameCls {
   }
 
   get_throwState() {
-    const scores = this.players[this.selPlayer].turn_scores;
-    const sections = this.players[this.selPlayer].turn_sections;
+    const scores = this.players[this.selPlayerIndex].turn_scores;
+    const sections = this.players[this.selPlayerIndex].turn_sections;
     //console.log(throws);
     const lastThrowsObj = {
       first: { id: "1", throw: 1, score: scores[0], section: sections[0] },
@@ -176,18 +187,22 @@ export default class gameCls {
   }
 
   onThrow(field, multiplier) {
-    this.players[this.selPlayer].thrown_in_turn = true;
+    this.players[this.selPlayerIndex].thrown_in_turn = true;
     //testing
     var score = field * multiplier;
     var section =
       (multiplier == 1 ? "S" : multiplier == 2 ? "D" : "T") + String(field);
 
-    if (this.players[this.selPlayer].active) {
-      if (this.players[this.selPlayer].remaining - score > 1) {
+    if (this.players[this.selPlayerIndex].active) {
+      if (this.players[this.selPlayerIndex].remaining - score > 1) {
         // normal throw
-        this.players[this.selPlayer].onThrow(score, section, this.throw_idx);
+        this.players[this.selPlayerIndex].onThrow(
+          score,
+          section,
+          this.throw_idx
+        );
       } else if (
-        (this.players[this.selPlayer].remaining - score == 0) &
+        (this.players[this.selPlayerIndex].remaining - score == 0) &
         (this.doubleOut & (multiplier == 2) || this.doubleOut != true)
       ) {
         //end of leg
@@ -202,9 +217,8 @@ export default class gameCls {
 
   onNextPlayer() {
     console.log("onNextPlayer exec");
-    // only if player has thrown yet
-    //console.log(this.players[this.selPlayer].thrown_in_turn)
-    if (this.players[this.selPlayer].thrown_in_turn) {
+
+    if (this.players[this.selPlayerIndex].thrown_in_turn) {
       this.nextPlayer();
       console.log("thrown_in_turn");
     }
@@ -213,7 +227,9 @@ export default class gameCls {
   correct_score(throw_idx, multiplier, field) {
     throw_idx--;
     console.log(throw_idx); //array starts at 0
-    const turn_sections = { ...this.players[this.selPlayer].turn_sections };
+    const turn_sections = {
+      ...this.players[this.selPlayerIndex].turn_sections,
+    };
     const darts_thrown_in_turn = this.throw_idx;
 
     console.log(turn_sections);
@@ -223,7 +239,7 @@ export default class gameCls {
     for (i = 2; i >= throw_idx; i--) {
       console.log(i);
       if (turn_sections[i] != false) {
-        this.players[this.selPlayer].remove_throw(i);
+        this.players[this.selPlayerIndex].remove_throw(i);
         this.throw_idx--;
       }
     }
@@ -256,48 +272,50 @@ export default class gameCls {
 
   nextPlayer() {
     //deactivate old player
-    this.players[this.selPlayer].onTurnEnd();
+    this.players[this.selPlayerIndex].onTurnEnd();
 
     //activate new player
     this.activatePlayer(
-      this.selPlayer == this.players.length - 1 ? 0 : (this.selPlayer += 1)
+      this.selPlayerIndex == this.players.length - 1
+        ? 0
+        : (this.selPlayerIndex += 1)
     );
   }
 
-  activatePlayer(id) {
+  activatePlayer(index) {
     this.throw_idx = 0;
-    this.selPlayer = id;
-    this.players[this.selPlayer].onTurnStart();
+    this.selPlayerIndex = index;
+    this.players[this.selPlayerIndex].onTurnStart();
   }
 
   onLegEnd() {
     console.log("Leg end");
 
-    this.players[this.selPlayer].onLegWon();
+    this.players[this.selPlayerIndex].onLegWon();
 
     //change remaining of all players to startscore
     this.players.forEach(function (item, index) {
       item.onNextLeg();
     });
 
-    if (this.players[this.selPlayer].legs == this.legs4set) {
+    if (this.players[this.selPlayerIndex].legs == this.legs4set) {
       //set won
       this.onSetEnd();
     } else {
       //activate player to start next leg
-      var id =
+      var index =
         this.lastLegStarter == this.players.length - 1
           ? 0
           : (this.lastLegStarter += 1);
-      this.activatePlayer(id);
-      this.lastLegStarter = id;
+      this.activatePlayer(index);
+      this.lastLegStarter = index;
     }
   }
 
   onSetEnd() {
     console.log("Set end");
     // increase won sets of player
-    this.players[this.selPlayer].sets++;
+    this.players[this.selPlayerIndex].sets++;
 
     // set legs of all players to 0
     this.players.forEach(function (item, index) {
@@ -305,54 +323,16 @@ export default class gameCls {
     });
 
     // activate player to start next set
-    var id =
+    var index =
       this.lastSetStarter == this.players.length - 1
         ? 0
         : (this.lastSetStarter += 1);
-    this.activatePlayer(id);
-    this.lastSetStarter = id;
+    this.activatePlayer(index);
+    this.lastSetStarter = index;
   }
 
   onOverthrow() {
     console.log("Overthrown");
-    this.players[this.selPlayer].onOverthrow();
+    this.players[this.selPlayerIndex].onOverthrow();
   }
-}
-
-if (require.main === module) {
-  const playerArray = [
-    { id: "1", name: "Jonathan" },
-    { id: "2", name: "Sophie" },
-  ];
-
-  var match = new Match(playerArray, 501, 1, 2, true);
-  /*
-  const readline = require("readline");
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  var recursiveRead = function () {
-    rl.question("Next Player? y/n ", function (next) {
-      if (next == "y") {
-        match.nextPlayer();
-        recursiveRead();
-      } else {
-        rl.question("Score: ", function (score) {
-          rl.question("Multiplier: ", function (multiplicator) {
-            console.log("\n");
-            console.log("Selected player: " + match.selPlayer);
-            match.onThrow(parseInt(score), parseInt(multiplicator));
-            match.players[match.selPlayer].represent();
-            console.log("\n");
-            recursiveRead();
-          });
-        });
-      }
-    });
-  };
-
-  recursiveRead();
-  */
 }

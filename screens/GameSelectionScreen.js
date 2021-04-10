@@ -15,6 +15,10 @@ import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
 import MultiSelectorComponent from "../components/MultiSelectorComponent";
 import { ScrollView } from "react-native-gesture-handler";
+import { Socket } from "../interfaces/socket";
+import ConnectedComponent from "../components/ConnectedComponent";
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
@@ -24,7 +28,7 @@ export default class GameSelectionScreen extends React.Component {
     this.navigation = props.navigation;
 
     this.state = {
-      players: [{ name: "", key: 0 }],
+      players: [{ name: "", key: uuidv4() }],
       startscore: 501,
       first_to: "1",
       win_crit: "Leg",
@@ -32,11 +36,23 @@ export default class GameSelectionScreen extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.socket = new Socket();
+
+    this.socket.sio.on("connect", () => {
+      this.setState({ connected: true });
+    });
+    this.socket.sio.on("disconnect", () => {
+      //this.socket.emit('echo', 'hello')
+      this.setState({ connected: false });
+    });
+  }
+
   renderPlayerItem = ({ item, index }) => {
     return (
       <View style={styles.listItem}>
         <TextInput
-          //style={styles.input}
+          style={styles.input}
           onChangeText={(text) => this.changePlayerName(text, item.key)}
           value={this.state.players[index].names}
           placeholder="Choose name"
@@ -61,9 +77,9 @@ export default class GameSelectionScreen extends React.Component {
   addPlayer() {
     let players = this.state.players;
     if (players.length == 0) {
-      players.push({ key: 0 });
+      players.push({ key: uuidv4() });
     } else {
-      players.push({ key: players[players.length - 1].key + 1 });
+      players.push({ key: uuidv4() });
     }
     this.setState({ players });
   }
@@ -110,8 +126,8 @@ export default class GameSelectionScreen extends React.Component {
 
   render() {
     return (
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.container}>
+      <View style={styles.container}>
+        <ScrollView style={styles.scrollView}>
           <View style={styles.selectionGroup}>
             <View style={styles.horizontal_box}>
               <View style={styles.text_box}>
@@ -126,7 +142,7 @@ export default class GameSelectionScreen extends React.Component {
               numColumns={1}
               data={this.state.players}
               renderItem={this.renderPlayerItem}
-              listKey={(item) => item.key}
+              listKey={(item) => item.key.toString()}
             />
           </View>
           <View style={styles.selectionGroup}>
@@ -191,14 +207,18 @@ export default class GameSelectionScreen extends React.Component {
               onPress={() =>
                 this.navigation.navigate("InGameScreen", {
                   gameInitObj: this.getGameInitObj(),
+                  connected: this.socket.sio.connected,
                 })
               }
             >
               <Text style={styles.text}>CONTINUE</Text>
             </Pressable>
           </View>
+        </ScrollView>
+        <View style={styles.bottomBar}>
+          <ConnectedComponent connected={this.state.connected} />
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }
@@ -266,5 +286,14 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 11,
     borderWidth: 1,
+  },
+  bottomBar: {
+    flexDirection: "row",
+    position: "absolute",
+    bottom: 0,
+    backgroundColor: colors.white,
+  },
+  input: {
+    paddingHorizontal: 5,
   },
 });

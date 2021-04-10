@@ -1,7 +1,9 @@
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
 class Player {
-  constructor(name, id, startscore) {
+  constructor(name, startscore) {
     this.name = name;
-    this.id = id;
+    this.id = uuidv4();
     this.startscore = startscore;
     this.remaining = this.startscore;
     this.sets = 0;
@@ -39,13 +41,25 @@ class Player {
       remaining: this.remaining,
       active: this.active,
       scoreBoard: [
-        { k: "Sets", v: this.sets },
-        { k: "Legs", v: this.legs },
+        { k: "Sets", v: this.sets, id: "81359722-a165-4ad7-b3c6-8c2f0f991dd2" },
+        { k: "Legs", v: this.legs, id: "74beedc2-b6f3-49a6-b7c2-4fd75927d524" },
       ],
       stats: [
-        { k: "Last score", v: this.last_score },
-        { k: "Darts thrown", v: this.darts_thrown_leg },
-        { k: "Average", v: this.avg },
+        {
+          k: "Last score",
+          v: this.last_score,
+          id: "9de9280f-516e-48c6-a41a-33b4a1e64b75",
+        },
+        {
+          k: "Darts thrown",
+          v: this.darts_thrown_leg,
+          id: "aab75b10-1a83-4a98-8fa5-aa2980e67c19",
+        },
+        {
+          k: "Average",
+          v: this.avg,
+          id: "be720bb8-e90a-47e0-8434-57467090846e",
+        },
       ],
     };
   }
@@ -127,11 +141,9 @@ export default class gameCls {
   constructor(playerArray, params) {
     // params = startscore, sets4win, legs4set, doubleOut
     var players = [];
-    id = 0;
     playerArray.forEach(function (item, index) {
-      let p = new Player(item.name, id, params.startscore);
+      let p = new Player(item.name, params.startscore);
       players.push(p);
-      id += 1;
     });
 
     this.players = players;
@@ -267,7 +279,9 @@ export default class gameCls {
   activatePlayer(id) {
     this.throw_idx = 0;
     this.selPlayer = id;
-    this.players[this.selPlayer].onTurnStart();
+    this.players[
+      this.players.findIndex((x) => x.id === this.selPlayer)
+    ].onTurnStart();
   }
 
   onLegEnd() {

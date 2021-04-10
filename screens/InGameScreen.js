@@ -106,7 +106,7 @@ export default class InGameScreen extends React.Component {
             numColumns={2}
             data={this.state.gameState}
             renderItem={this.renderPlayerItem}
-            listKey={(item) => item.id}
+            listKey={(item) => item.id.toString()}
           />
         </View>
         <LiveDartsComponent

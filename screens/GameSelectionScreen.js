@@ -40,14 +40,11 @@ export default class GameSelectionScreen extends React.Component {
     this.socket = new Socket();
 
     this.socket.sio.on("connect", () => {
-      this.connected = true;
       this.setState({ connected: true });
     });
     this.socket.sio.on("disconnect", () => {
       //this.socket.emit('echo', 'hello')
-      this.connected = false;
       this.setState({ connected: false });
-      alert("Connection to board lost");
     });
   }
 
@@ -55,7 +52,7 @@ export default class GameSelectionScreen extends React.Component {
     return (
       <View style={styles.listItem}>
         <TextInput
-          //style={styles.input}
+          style={styles.input}
           onChangeText={(text) => this.changePlayerName(text, item.key)}
           value={this.state.players[index].names}
           placeholder="Choose name"
@@ -210,6 +207,7 @@ export default class GameSelectionScreen extends React.Component {
               onPress={() =>
                 this.navigation.navigate("InGameScreen", {
                   gameInitObj: this.getGameInitObj(),
+                  connected: this.socket.sio.connected,
                 })
               }
             >
@@ -294,5 +292,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     backgroundColor: colors.white,
+  },
+  input: {
+    paddingHorizontal: 5,
   },
 });

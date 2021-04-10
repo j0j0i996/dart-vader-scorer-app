@@ -11,18 +11,21 @@ export default class InGameScreen extends React.Component {
     super(props);
     this.gameInitObj = props.route.params.gameInitObj;
     this.navigation = props.navigation;
+    this.socket = new Socket();
 
     this.game_handler = new gameHandler(this.gameInitObj);
 
     this.state = {
       gameState: this.game_handler.get_gameState(),
       throwState: this.game_handler.get_throwState(),
-      connected: false,
+      connected: props.route.params.connected,
     };
   }
 
   componentDidMount() {
     //this.socket = new SocketGame(game_handler)
+
+    this.socket = new Socket();
 
     this.navigation.setOptions({
       headerTitle:
@@ -33,18 +36,12 @@ export default class InGameScreen extends React.Component {
         (this.gameInitObj.params.first_to > 1 ? "s" : ""),
     });
 
-    this.socket = new Socket();
-
     this.socket.sio.on("connect", () => {
-      this.connected = true;
       this.setState({ connected: true });
       this.socket.sio.emit("start_dect", "");
     });
     this.socket.sio.on("disconnect", () => {
-      //this.socket.emit('echo', 'hello')
-      this.connected = false;
       this.setState({ connected: false });
-      alert("Connection to board lost");
     });
     this.socket.sio.on("dart", (res) => {
       var data = JSON.parse(res);
@@ -57,11 +54,6 @@ export default class InGameScreen extends React.Component {
       this.setState({ throwState: this.game_handler.get_throwState() });
     });
   }
-
-  //componentWillUnmount() {
-  //this.socket.removeAllListeners("dart");
-  //console.log('dart listener unregistered');
-  //}
 
   corr_handler(throw_idx, multiplier, field) {
     console.log("Field: " + field);

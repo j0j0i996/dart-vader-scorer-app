@@ -17,6 +17,8 @@ import MultiSelectorComponent from "../components/MultiSelectorComponent";
 import { ScrollView } from "react-native-gesture-handler";
 import { Socket } from "../interfaces/socket";
 import ConnectedComponent from "../components/ConnectedComponent";
+import "react-native-get-random-values";
+import { v4 as uuidv4 } from "uuid";
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
@@ -26,7 +28,7 @@ export default class GameSelectionScreen extends React.Component {
     this.navigation = props.navigation;
 
     this.state = {
-      players: [{ name: "", key: 0 }],
+      players: [{ name: "", key: uuidv4() }],
       startscore: 501,
       first_to: "1",
       win_crit: "Leg",
@@ -78,9 +80,9 @@ export default class GameSelectionScreen extends React.Component {
   addPlayer() {
     let players = this.state.players;
     if (players.length == 0) {
-      players.push({ key: 0 });
+      players.push({ key: uuidv4() });
     } else {
-      players.push({ key: players[players.length - 1].key + 1 });
+      players.push({ key: uuidv4() });
     }
     this.setState({ players });
   }

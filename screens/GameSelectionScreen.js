@@ -34,11 +34,11 @@ export default class GameSelectionScreen extends React.Component {
       win_crit: "Leg",
       doubleOut: true,
     };
+
+    this.socket = new Socket();
   }
 
   componentDidMount() {
-    this.socket = new Socket();
-
     this.socket.sio.on("connect", () => {
       this.setState({ connected: true });
     });
@@ -142,7 +142,7 @@ export default class GameSelectionScreen extends React.Component {
               numColumns={1}
               data={this.state.players}
               renderItem={this.renderPlayerItem}
-              listKey={(item) => item.key.toString()}
+              listKey={(item) => String(item.key)}
             />
           </View>
           <View style={styles.selectionGroup}>

@@ -20,13 +20,11 @@ export default class InGameScreen extends React.Component {
       throwState: this.game_handler.get_throwState(),
       connected: props.route.params.connected,
     };
+
+    this.socket = new Socket();
   }
 
   componentDidMount() {
-    //this.socket = new SocketGame(game_handler)
-
-    this.socket = new Socket();
-
     this.navigation.setOptions({
       headerTitle:
         "First to " +
@@ -98,7 +96,7 @@ export default class InGameScreen extends React.Component {
             numColumns={2}
             data={this.state.gameState}
             renderItem={this.renderPlayerItem}
-            listKey={(item) => item.id.toString()}
+            listKey={(item) => String(item.id)}
           />
         </View>
         <LiveDartsComponent

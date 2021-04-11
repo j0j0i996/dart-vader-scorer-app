@@ -57,7 +57,7 @@ function ScoreBoardView(props) {
         horizontal={true}
         data={props.scoreBoard}
         renderItem={renderItem}
-        listKey={(item) => item.id.toString() + props.id.toString()}
+        listKey={(item) => String(item.id) + String(props.id)}
       />
     </View>
   );
@@ -85,7 +85,7 @@ function StatsView(props) {
       <FlatList
         horizontal={false}
         data={props.stats}
-        listKey={(item) => item.id.toString() + props.id.toString()}
+        listKey={(item) => String(item.id) + String(props.id)}
         renderItem={renderItem}
       />
     </View>

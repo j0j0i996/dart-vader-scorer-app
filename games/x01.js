@@ -216,11 +216,8 @@ export default class gameCls {
   }
 
   onNextPlayer() {
-    console.log("onNextPlayer exec");
-
     if (this.players[this.selPlayerIndex].thrown_in_turn) {
       this.nextPlayer();
-      console.log("thrown_in_turn");
     }
   }
 

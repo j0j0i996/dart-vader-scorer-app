@@ -38,7 +38,6 @@ export default class GameSelectionScreen extends React.Component {
 
   componentDidMount() {
     this.socket = new Socket();
-
     this.socket.sio.on("connect", () => {
       this.setState({ connected: true });
     });
@@ -46,6 +45,14 @@ export default class GameSelectionScreen extends React.Component {
       //this.socket.emit('echo', 'hello')
       this.setState({ connected: false });
     });
+  }
+
+  componentWillUnmount() {
+    this.socket.sio.disconnect();
+    delete this.socket;
+    //this.socket.sio.removeAllListeners();
+    //this.socket.sio.off("connect");
+    //this.socket.sio.off("disconnect");
   }
 
   renderPlayerItem = ({ item, index }) => {
@@ -142,7 +149,7 @@ export default class GameSelectionScreen extends React.Component {
               numColumns={1}
               data={this.state.players}
               renderItem={this.renderPlayerItem}
-              listKey={(item) => item.key.toString()}
+              listKey={(item) => String(item.key)}
             />
           </View>
           <View style={styles.selectionGroup}>

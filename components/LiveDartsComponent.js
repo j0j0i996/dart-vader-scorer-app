@@ -21,8 +21,6 @@ export default function LiveDartsComponent(props) {
   ];
   let itemList = [];
 
-  console.log(items);
-
   items.forEach((item, index) => {
     itemList.push(
       <SingleDartView

@@ -34,11 +34,10 @@ export default class GameSelectionScreen extends React.Component {
       win_crit: "Leg",
       doubleOut: true,
     };
-
-    this.socket = new Socket();
   }
 
   componentDidMount() {
+    this.socket = new Socket();
     this.socket.sio.on("connect", () => {
       this.setState({ connected: true });
     });
@@ -46,6 +45,14 @@ export default class GameSelectionScreen extends React.Component {
       //this.socket.emit('echo', 'hello')
       this.setState({ connected: false });
     });
+  }
+
+  componentWillUnmount() {
+    this.socket.sio.disconnect();
+    delete this.socket;
+    //this.socket.sio.removeAllListeners();
+    //this.socket.sio.off("connect");
+    //this.socket.sio.off("disconnect");
   }
 
   renderPlayerItem = ({ item, index }) => {

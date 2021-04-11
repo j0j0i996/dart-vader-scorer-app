@@ -11,7 +11,6 @@ export default class InGameScreen extends React.Component {
     super(props);
     this.gameInitObj = props.route.params.gameInitObj;
     this.navigation = props.navigation;
-    this.socket = new Socket();
 
     this.game_handler = new gameHandler(this.gameInitObj);
 
@@ -20,8 +19,6 @@ export default class InGameScreen extends React.Component {
       throwState: this.game_handler.get_throwState(),
       connected: props.route.params.connected,
     };
-
-    this.socket = new Socket();
   }
 
   componentDidMount() {
@@ -33,6 +30,8 @@ export default class InGameScreen extends React.Component {
         this.gameInitObj.params.win_crit +
         (this.gameInitObj.params.first_to > 1 ? "s" : ""),
     });
+
+    this.socket = new Socket();
 
     this.socket.sio.on("connect", () => {
       this.setState({ connected: true });
@@ -53,8 +52,14 @@ export default class InGameScreen extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    this.socket.sio.disconnect();
+    delete this.socket;
+    //delete this.socket;
+    //this.socket.sio.removeAllListeners();
+  }
+
   corr_handler(throw_idx, multiplier, field) {
-    console.log("Field: " + field);
     throw_idx = parseInt(throw_idx);
     multiplier = parseInt(multiplier);
     field = parseInt(field);

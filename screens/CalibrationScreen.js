@@ -84,8 +84,6 @@ export default class CalibrationScreen extends React.Component {
     let closest_field = this.state.data[idx].closest_field;
     var success = await this.api.calibration(idx, closest_field);
 
-    console.log(success);
-
     if (!success.connection) {
       alert("Not connected to board");
     } else if (!success.calibration) {
@@ -184,7 +182,7 @@ export default class CalibrationScreen extends React.Component {
             numColumns={1}
             data={this.state.data}
             renderItem={this.renderRowItem}
-            listKey={(item) => item.id}
+            listKey={(item) => String(item.id)}
           />
         </View>
       </ScrollView>

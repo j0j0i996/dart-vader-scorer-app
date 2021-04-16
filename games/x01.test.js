@@ -18,20 +18,28 @@ var gameInitObj = {
   params: params,
 };
 
-game = new gameCls(playerArray, params);
-
-test("uuid", () => {
-  len = game.players[0].id.length;
-  console.log(len);
-  expect(len).toEqual(36);
+test("initialize", () => {
+  game = new gameCls(playerArray, params);
+  expect(game.selPlayerIndex).toEqual(0);
 });
 
-test("game flow", () => {
-  expect(game.selPlayerIndex).toEqual(0);
+test("3 trows", () => {
+  game = new gameCls(playerArray, params);
   game.onThrow(10, 1);
   game.onThrow(10, 1);
   game.onThrow(10, 1);
   expect(game.players[0].remaining).toEqual(471);
+});
+
+test("next player", () => {
+  game = new gameCls(playerArray, params);
+  game.onThrow(10, 1);
   game.onNextPlayer();
   expect(game.selPlayerIndex).toEqual(1);
+});
+
+test("leg end", () => {
+  game = new gameCls(playerArray, params);
+  game.onThrow(501, 1);
+  expect(game.throw_idx).toEqual(0);
 });

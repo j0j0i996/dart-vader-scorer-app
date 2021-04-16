@@ -201,6 +201,7 @@ export default class gameCls {
           section,
           this.throw_idx
         );
+        this.throw_idx += 1;
       } else if (
         (this.players[this.selPlayerIndex].remaining - score == 0) &
         (this.doubleOut & (multiplier == 2) || this.doubleOut != true)
@@ -212,7 +213,6 @@ export default class gameCls {
         this.onOverthrow();
       }
     }
-    this.throw_idx += 1;
   }
 
   onNextPlayer() {
@@ -286,8 +286,6 @@ export default class gameCls {
   }
 
   onLegEnd() {
-    console.log("Leg end");
-
     this.players[this.selPlayerIndex].onLegWon();
 
     //change remaining of all players to startscore
@@ -310,7 +308,6 @@ export default class gameCls {
   }
 
   onSetEnd() {
-    console.log("Set end");
     // increase won sets of player
     this.players[this.selPlayerIndex].sets++;
 
@@ -329,7 +326,6 @@ export default class gameCls {
   }
 
   onOverthrow() {
-    console.log("Overthrown");
     this.players[this.selPlayerIndex].onOverthrow();
   }
 }

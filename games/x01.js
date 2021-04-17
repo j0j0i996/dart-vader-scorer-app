@@ -3,8 +3,7 @@ class Player {
   constructor(name, startscore) {
     this.name = name;
     this.id = uuidv4();
-    this.startscore = startscore;
-    this.remaining = this.startscore;
+    this.remaining = startscore;
     this.sets = 0;
     this.legs = 0;
     this.last_score = 0;
@@ -12,28 +11,15 @@ class Player {
     this.darts_thrown_total = 0;
     this.points_thrown_total = 0;
     this.avg = 0;
+    // todo make 3 / 4 below into one turn object
     this.turn_scores = [false, false, false];
     this.turn_sections = [false, false, false];
+    this.throw_valid = [true, true, true];
     this.thrown_in_turn = false;
     this.active = false;
   }
 
-  represent() {
-    console.log(
-      "Sets: " +
-        this.sets +
-        " Legs: " +
-        this.legs +
-        " Remaining: " +
-        this.remaining
-    );
-    console.log("Player active? " + this.active);
-    console.log("Darts thrown: " + this.darts_thrown_leg);
-    console.log("Points total: " + this.points_thrown_total);
-    console.log("Avg: " + this.avg);
-  }
-
-  get_playerState() {
+  get playerState() {
     return {
       name: this.name,
       id: this.id,
@@ -63,6 +49,21 @@ class Player {
     };
   }
 
+  represent() {
+    console.log(
+      "Sets: " +
+        this.sets +
+        " Legs: " +
+        this.legs +
+        " Remaining: " +
+        this.remaining
+    );
+    console.log("Player active? " + this.active);
+    console.log("Darts thrown: " + this.darts_thrown_leg);
+    console.log("Points total: " + this.points_thrown_total);
+    console.log("Avg: " + this.avg);
+  }
+
   onThrow(score, section, throw_idx) {
     this.remaining -= score;
     this.turn_scores[throw_idx] = score;
@@ -74,24 +75,31 @@ class Player {
   }
 
   onLegWon() {
-    //deactivate player
     this.active = false;
-
     this.legs++;
     this.darts_thrown_total++;
     this.points_thrown_total += this.remaining;
     this.avg = (this.points_thrown_total / this.darts_thrown_total) * 3;
   }
 
-  onOverthrow() {
-    // deactivate player (for potential frustration throw :) )
+  onOverthrow(score, section, throw_idx) {
     this.active = false;
+    this.turn_scores[throw_idx] = score;
+    this.turn_sections[throw_idx] = section;
+    this.throw_valid[throw_idx] = false;
+    this.darts_thrown_leg++;
+    this.darts_thrown_total++;
+  }
 
+  resetOverthrow() {
     // reset score
     var turn_scores = this.turn_scores;
     var total = 0;
+    var throw_valid = this.throw_valid;
     turn_scores.forEach(function (item, index) {
-      total += item;
+      if (throw_valid[index]) {
+        total += item;
+      }
     });
 
     this.remaining += total;
@@ -101,16 +109,20 @@ class Player {
     this.avg = (this.points_thrown_total / this.darts_thrown_total) * 3;
     this.turn_scores = [false, false, false];
     this.turn_sections = [false, false, false];
+    this.throw_valid = [true, true, true];
+
+    console.log(total);
   }
 
-  onNextLeg() {
-    this.remaining = this.startscore;
+  onNextLeg(startscore) {
+    this.remaining = startscore;
     this.darts_thrown_leg = 0;
   }
 
   onTurnStart() {
     this.turn_scores = [false, false, false];
     this.turn_sections = [false, false, false];
+    this.throw_valid = [true, true, true];
     this.active = true;
     this.thrown_in_turn = false;
   }
@@ -124,15 +136,16 @@ class Player {
     this.last_score = score;
   }
 
-  remove_throw(throw_idx) {
-    this.remaining += this.turn_scores[throw_idx];
-    this.points_thrown_total -= this.turn_scores[throw_idx];
+  removeThrow(throw_idx) {
+    if (this.throw_valid[throw_idx]) {
+      this.remaining += this.turn_scores[throw_idx];
+      this.points_thrown_total -= this.turn_scores[throw_idx];
+    }
     this.darts_thrown_leg--;
     this.darts_thrown_total--;
     this.turn_sections[throw_idx] = false;
     this.turn_scores[throw_idx] = false;
-
-    console.log("Throw removed");
+    this.throw_valid[throw_idx] = true;
   }
 }
 
@@ -151,6 +164,8 @@ export default class gameCls {
     this.lastLegStarter = 0;
     this.lastSetStarter = 0;
     this.throw_idx = 0;
+    this.await_leg_end = false;
+    this.await_reset_overthrow = false;
     this.startscore = params.startscore;
 
     if (params.win_crit == "Set") {
@@ -165,25 +180,43 @@ export default class gameCls {
     this.back_up = false; // in case of change operation
   }
 
-  get_gameState() {
+  get gameState() {
     var gameState = [];
     this.players.forEach(function (item) {
-      gameState.push(item.get_playerState());
+      gameState.push(item.playerState);
     });
-    //console.log(gameState);
     return gameState;
   }
 
-  get_throwState() {
+  get throwState() {
     const scores = this.players[this.selPlayerIndex].turn_scores;
     const sections = this.players[this.selPlayerIndex].turn_sections;
-    //console.log(throws);
-    const lastThrowsObj = {
-      first: { id: "1", throw: 1, score: scores[0], section: sections[0] },
-      second: { id: "2", throw: 2, score: scores[1], section: sections[1] },
-      third: { id: "3", throw: 3, score: scores[2], section: sections[2] },
+    const throw_valid = this.players[this.selPlayerIndex].throw_valid;
+
+    const throwState = {
+      first: {
+        id: "1",
+        throw: 1,
+        score: scores[0],
+        section: sections[0],
+        valid: throw_valid[0],
+      },
+      second: {
+        id: "2",
+        throw: 2,
+        score: scores[1],
+        section: sections[1],
+        valid: throw_valid[1],
+      },
+      third: {
+        id: "3",
+        throw: 3,
+        score: scores[2],
+        section: sections[2],
+        valid: throw_valid[2],
+      },
     };
-    return lastThrowsObj;
+    return throwState;
   }
 
   onThrow(field, multiplier) {
@@ -207,36 +240,57 @@ export default class gameCls {
         (this.doubleOut & (multiplier == 2) || this.doubleOut != true)
       ) {
         //end of leg
-        this.onLegEnd();
+        this.players[this.selPlayerIndex].onThrow(
+          score,
+          section,
+          this.throw_idx
+        );
+        this.throw_idx += 1;
+
+        this.await_leg_end = true;
+
+        this.players[this.selPlayerIndex].active = false;
       } else {
         //overthrow
-        this.onOverthrow();
+        this.players[this.selPlayerIndex].onOverthrow(
+          score,
+          section,
+          this.throw_idx
+        );
+        this.throw_idx += 1;
+        this.await_reset_overthrow = true;
       }
     }
   }
 
   onNextPlayer() {
-    if (this.players[this.selPlayerIndex].thrown_in_turn) {
+    if (this.await_leg_end) {
+      this.await_leg_end = false;
+      this.onLegEnd();
+    } else if (this.await_reset_overthrow) {
+      this.await_reset_overthrow = false;
+      this.players[this.selPlayerIndex].resetOverthrow();
+      this.nextPlayer();
+    } else if (this.players[this.selPlayerIndex].thrown_in_turn) {
       this.nextPlayer();
     }
   }
 
-  correct_score(throw_idx, multiplier, field) {
+  correctScore(throw_idx, multiplier, field) {
+    this.await_leg_end = false;
+    this.await_reset_overthrow = false;
+    this.players[this.selPlayerIndex].active = true;
+
     throw_idx--;
-    console.log(throw_idx); //array starts at 0
     const turn_sections = {
       ...this.players[this.selPlayerIndex].turn_sections,
     };
     const darts_thrown_in_turn = this.throw_idx;
 
-    console.log(turn_sections);
-    console.log(this.throw_idx);
-
     var i;
     for (i = 2; i >= throw_idx; i--) {
-      console.log(i);
       if (turn_sections[i] != false) {
-        this.players[this.selPlayerIndex].remove_throw(i);
+        this.players[this.selPlayerIndex].removeThrow(i);
         this.throw_idx--;
       }
     }
@@ -248,7 +302,6 @@ export default class gameCls {
     ];
     var MultiplierMap = new Map(kvArray);
 
-    console.log(turn_sections);
     for (i = throw_idx; i < 3; i++) {
       if (i == throw_idx) {
         this.throw_idx = i;
@@ -259,12 +312,9 @@ export default class gameCls {
         var multiplier_temp = MultiplierMap.get(
           turn_sections[i].substring(0, 1)
         );
-        console.log("field: " + field_temp);
-        console.log("multiplier: " + multiplier_temp);
         this.onThrow(field_temp, multiplier_temp);
       }
     }
-    //console.log(turn_sections)
   }
 
   nextPlayer() {
@@ -286,17 +336,20 @@ export default class gameCls {
   }
 
   onLegEnd() {
+    this.players[this.selPlayerIndex].onTurnEnd();
     this.players[this.selPlayerIndex].onLegWon();
-
-    //change remaining of all players to startscore
-    this.players.forEach(function (item, index) {
-      item.onNextLeg();
-    });
 
     if (this.players[this.selPlayerIndex].legs == this.legs4set) {
       //set won
       this.onSetEnd();
     } else {
+      //change remaining of all players to startscore
+      //change remaining of all players to startscore
+      var startscore = this.startscore;
+      this.players.forEach(function (item, index) {
+        item.onNextLeg(startscore);
+      });
+
       //activate player to start next leg
       var index =
         this.lastLegStarter == this.players.length - 1
@@ -316,6 +369,12 @@ export default class gameCls {
       item.legs = 0;
     });
 
+    //change remaining of all players to startscore
+    var startscore = this.startscore;
+    this.players.forEach(function (item, index) {
+      item.onNextLeg(startscore);
+    });
+
     // activate player to start next set
     var index =
       this.lastSetStarter == this.players.length - 1
@@ -323,9 +382,5 @@ export default class gameCls {
         : (this.lastSetStarter += 1);
     this.activatePlayer(index);
     this.lastSetStarter = index;
-  }
-
-  onOverthrow() {
-    this.players[this.selPlayerIndex].onOverthrow();
   }
 }

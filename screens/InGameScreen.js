@@ -15,8 +15,8 @@ export default class InGameScreen extends React.Component {
     this.game_handler = new gameHandler(this.gameInitObj);
 
     this.state = {
-      gameState: this.game_handler.get_gameState(),
-      throwState: this.game_handler.get_throwState(),
+      gameState: this.game_handler.gameState,
+      throwState: this.game_handler.throwState,
       connected: props.route.params.connected,
     };
   }
@@ -47,8 +47,8 @@ export default class InGameScreen extends React.Component {
         data.field,
         data.multiplier
       );
-      this.setState({ gameState: this.game_handler.get_gameState() });
-      this.setState({ throwState: this.game_handler.get_throwState() });
+      this.setState({ gameState: this.game_handler.gameState });
+      this.setState({ throwState: this.game_handler.throwState });
     });
   }
 
@@ -59,7 +59,7 @@ export default class InGameScreen extends React.Component {
     //this.socket.sio.removeAllListeners();
   }
 
-  corr_handler(throw_idx, multiplier, field) {
+  corrHandler(throw_idx, multiplier, field) {
     throw_idx = parseInt(throw_idx);
     multiplier = parseInt(multiplier);
     field = parseInt(field);
@@ -70,9 +70,9 @@ export default class InGameScreen extends React.Component {
       return false;
     }
 
-    this.game_handler.correct_score(throw_idx, multiplier, field);
-    this.setState({ gameState: this.game_handler.get_gameState() });
-    this.setState({ throwState: this.game_handler.get_throwState() });
+    this.game_handler.correctScore(throw_idx, multiplier, field);
+    this.setState({ gameState: this.game_handler.gameState });
+    this.setState({ throwState: this.game_handler.throwState });
 
     return true;
   }
@@ -105,8 +105,8 @@ export default class InGameScreen extends React.Component {
           />
         </View>
         <LiveDartsComponent
-          throwObject={this.state.throwState}
-          corr_handler={this.corr_handler.bind(this)}
+          throwState={this.state.throwState}
+          corrHandler={this.corrHandler.bind(this)}
         />
         <View style={styles.bottomBar}>
           <ConnectedComponent connected={this.state.connected} />

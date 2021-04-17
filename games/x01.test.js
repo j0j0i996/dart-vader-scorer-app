@@ -18,7 +18,7 @@ var gameInitObj = {
   params: params,
 };
 
-test("initialize", () => {
+test("Initialize", () => {
   game = new gameCls(playerArray, params);
   expect(game.selPlayerIndex).toEqual(0);
 });
@@ -31,15 +31,35 @@ test("3 trows", () => {
   expect(game.players[0].remaining).toEqual(471);
 });
 
-test("next player", () => {
+test("Next player", () => {
   game = new gameCls(playerArray, params);
   game.onThrow(10, 1);
   game.onNextPlayer();
   expect(game.selPlayerIndex).toEqual(1);
 });
 
-test("leg end", () => {
+test("Leg end", () => {
   game = new gameCls(playerArray, params);
-  game.onThrow(501, 1);
-  expect(game.throw_idx).toEqual(0);
+  game.onThrow(499, 1);
+  game.onThrow(1, 2);
+  expect(game.players[0].remaining).toEqual(0);
+});
+
+test("Leg start", () => {
+  game = new gameCls(playerArray, params);
+  game.onThrow(499, 1);
+  game.onThrow(1, 2);
+  game.onNextPlayer();
+  expect(game.players[0].remaining).toEqual(501);
+  expect(game.selPlayerIndex).toEqual(1);
+});
+
+test("gameState", () => {
+  game = new gameCls(playerArray, params);
+  console.log(game.gameState);
+});
+
+test("throwState", () => {
+  game = new gameCls(playerArray, params);
+  console.log(game.throwState);
 });

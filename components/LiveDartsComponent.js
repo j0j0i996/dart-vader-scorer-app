@@ -15,9 +15,9 @@ import MultiSelectorComponent from "../components/MultiSelectorComponent";
 
 export default function LiveDartsComponent(props) {
   let items = [
-    props.throwObject.first,
-    props.throwObject.second,
-    props.throwObject.third,
+    props.throwState.first,
+    props.throwState.second,
+    props.throwState.third,
   ];
   let itemList = [];
 
@@ -25,7 +25,7 @@ export default function LiveDartsComponent(props) {
     itemList.push(
       <SingleDartView
         throwObject={item}
-        corr_handler={props.corr_handler}
+        corrHandler={props.corrHandler}
         key={index}
       />
     );
@@ -46,6 +46,7 @@ function SingleDartView(props) {
         props.throwObject.score === parseInt(props.throwObject.score, 10)
           ? { backgroundColor: colors.primary }
           : { backgroundColor: colors.lightgray },
+        !props.throwObject.valid ? { backgroundColor: colors.red } : {},
       ]}
       onPress={() => setModalVisible(true)}
     >
@@ -99,7 +100,7 @@ function SingleDartView(props) {
               <Pressable
                 style={[styles.button, styles.buttonSave]}
                 onPress={() => {
-                  var success = props.corr_handler(
+                  var success = props.corrHandler(
                     props.throwObject.throw,
                     selectedMultiplier,
                     selectedField

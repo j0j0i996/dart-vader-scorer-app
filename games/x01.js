@@ -226,6 +226,10 @@ export default class gameCls {
     var section =
       (multiplier == 1 ? "S" : multiplier == 2 ? "D" : "T") + String(field);
 
+    if (this.throw_idx > 2) {
+      return;
+    }
+
     if (this.players[this.selPlayerIndex].active) {
       if (this.players[this.selPlayerIndex].remaining - score > 1) {
         // normal throw

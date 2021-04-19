@@ -42,7 +42,6 @@ export default class GameSelectionScreen extends React.Component {
       this.setState({ connected: true });
     });
     this.socket.sio.on("disconnect", () => {
-      //this.socket.emit('echo', 'hello')
       this.setState({ connected: false });
     });
   }
@@ -50,26 +49,23 @@ export default class GameSelectionScreen extends React.Component {
   componentWillUnmount() {
     this.socket.sio.disconnect();
     delete this.socket;
-    //this.socket.sio.removeAllListeners();
-    //this.socket.sio.off("connect");
-    //this.socket.sio.off("disconnect");
   }
 
   renderPlayerItem = ({ item, index }) => {
     return (
       <View style={styles.listItem}>
         <TextInput
-          style={styles.input}
+          style={{ flex: 0.9 }}
           onChangeText={(text) => this.changePlayerName(text, item.key)}
           value={this.state.players[index].names}
           placeholder="Choose name"
           maxLength={24}
         />
         <Pressable
-          //style={styles.button}
+          style={{ flex: 0.1 }}
           onPress={() => this.deletePlayer(item.key)}
         >
-          <Icon name="delete-forever" color={colors.secondary} size={24} />
+          <Icon name="delete-forever" color={colors.secondary} size={26} />
         </Pressable>
       </View>
     );
@@ -251,7 +247,7 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: colors.white,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
   },
   horizontal_box: {
     margin: 0,
@@ -299,8 +295,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     backgroundColor: colors.white,
-  },
-  input: {
-    paddingHorizontal: 5,
   },
 });

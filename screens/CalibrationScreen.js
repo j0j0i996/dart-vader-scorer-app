@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import colors from "../config/colors";
 import { Typography } from "../styles";
-import { SERVER_URL } from "../constants";
 import { Icon } from "react-native-elements";
 import { API } from "../interfaces/api";
 import { Colors } from "react-native/Libraries/NewAppScreen";
@@ -44,7 +43,6 @@ export default class CalibrationScreen extends React.Component {
     cams.forEach(function (item, index) {
       item.hide = true;
       item.closest_field = "10";
-      item.img_src = SERVER_URL + "/get-cal-img/" + item.cam_key;
       item.img_hash = Date.now();
       item.img_errored = false;
       item.loading = false;
@@ -53,6 +51,15 @@ export default class CalibrationScreen extends React.Component {
     this.state = {
       data: cams,
     };
+  }
+
+  async componentDidMount() {
+    let data = this.state.data;
+    let address = await this.api.get_address();
+    data.forEach(function (item, index) {
+      item.img_src = address + "/get-cal-img/" + item.cam_key;
+    });
+    this.setState({ data: data });
   }
 
   updateHide(idx) {

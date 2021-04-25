@@ -1,6 +1,5 @@
 import socketIOClient from "socket.io-client";
 import React, { useState, useEffect } from "react";
-import { SERVER_URL } from "../constants";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export class Socket {

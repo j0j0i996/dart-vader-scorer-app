@@ -33,22 +33,24 @@ export default class InGameScreen extends React.Component {
 
     this.socket = new Socket();
 
-    this.socket.sio.on("connect", () => {
-      this.setState({ connected: true });
-      this.socket.sio.emit("start_dect", "");
-    });
-    this.socket.sio.on("disconnect", () => {
-      this.setState({ connected: false });
-    });
-    this.socket.sio.on("dart", (res) => {
-      var data = JSON.parse(res);
-      this.game_handler.onGameEvent(
-        data.nextPlayer,
-        data.field,
-        data.multiplier
-      );
-      this.setState({ gameState: this.game_handler.gameState });
-      this.setState({ throwState: this.game_handler.throwState });
+    this.socket.start_socket().then(() => {
+      this.socket.sio.on("connect", () => {
+        this.setState({ connected: true });
+        this.socket.sio.emit("start_dect", "");
+      });
+      this.socket.sio.on("disconnect", () => {
+        this.setState({ connected: false });
+      });
+      this.socket.sio.on("dart", (res) => {
+        var data = JSON.parse(res);
+        this.game_handler.onGameEvent(
+          data.nextPlayer,
+          data.field,
+          data.multiplier
+        );
+        this.setState({ gameState: this.game_handler.gameState });
+        this.setState({ throwState: this.game_handler.throwState });
+      });
     });
   }
 

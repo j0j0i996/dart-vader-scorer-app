@@ -17,8 +17,8 @@ import MultiSelectorComponent from "../components/MultiSelectorComponent";
 import { ScrollView } from "react-native-gesture-handler";
 import { Socket } from "../interfaces/socket";
 import ConnectedComponent from "../components/ConnectedComponent";
-import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
+import "react-native-get-random-values";
 
 LogBox.ignoreLogs(["VirtualizedLists should never be nested"]);
 
@@ -38,11 +38,13 @@ export default class GameSelectionScreen extends React.Component {
 
   componentDidMount() {
     this.socket = new Socket();
-    this.socket.sio.on("connect", () => {
-      this.setState({ connected: true });
-    });
-    this.socket.sio.on("disconnect", () => {
-      this.setState({ connected: false });
+    this.socket.start_socket().then(() => {
+      this.socket.sio.on("connect", () => {
+        this.setState({ connected: true });
+      });
+      this.socket.sio.on("disconnect", () => {
+        this.setState({ connected: false });
+      });
     });
   }
 

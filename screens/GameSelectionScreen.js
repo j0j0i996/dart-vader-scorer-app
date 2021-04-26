@@ -15,7 +15,6 @@ import { Typography } from "../styles";
 import { Icon } from "react-native-elements";
 import MultiSelectorComponent from "../components/MultiSelectorComponent";
 import { ScrollView } from "react-native-gesture-handler";
-import { Socket } from "../interfaces/socket";
 import ConnectedComponent from "../components/ConnectedComponent";
 import { v4 as uuidv4 } from "uuid";
 import "react-native-get-random-values";
@@ -34,23 +33,6 @@ export default class GameSelectionScreen extends React.Component {
       win_crit: "Leg",
       doubleOut: true,
     };
-  }
-
-  componentDidMount() {
-    this.socket = new Socket();
-    this.socket.start_socket().then(() => {
-      this.socket.sio.on("connect", () => {
-        this.setState({ connected: true });
-      });
-      this.socket.sio.on("disconnect", () => {
-        this.setState({ connected: false });
-      });
-    });
-  }
-
-  componentWillUnmount() {
-    this.socket.sio.disconnect();
-    delete this.socket;
   }
 
   renderPlayerItem = ({ item, index }) => {
@@ -212,7 +194,6 @@ export default class GameSelectionScreen extends React.Component {
               onPress={() =>
                 this.navigation.navigate("InGameScreen", {
                   gameInitObj: this.getGameInitObj(),
-                  connected: this.socket.sio.connected,
                 })
               }
             >
@@ -221,7 +202,7 @@ export default class GameSelectionScreen extends React.Component {
           </View>
         </ScrollView>
         <View style={styles.bottomBar}>
-          <ConnectedComponent connected={this.state.connected} />
+          <ConnectedComponent />
         </View>
       </View>
     );

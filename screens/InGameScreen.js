@@ -35,12 +35,9 @@ export default class InGameScreen extends React.Component {
 
     this.socket.start_socket().then(() => {
       this.socket.sio.on("connect", () => {
-        this.setState({ connected: true });
         this.socket.sio.emit("start_dect", "");
       });
-      this.socket.sio.on("disconnect", () => {
-        this.setState({ connected: false });
-      });
+      this.socket.sio.on("disconnect", () => {});
       this.socket.sio.on("dart", (res) => {
         var data = JSON.parse(res);
         this.game_handler.onGameEvent(
@@ -57,8 +54,6 @@ export default class InGameScreen extends React.Component {
   componentWillUnmount() {
     this.socket.sio.disconnect();
     delete this.socket;
-    //delete this.socket;
-    //this.socket.sio.removeAllListeners();
   }
 
   corrHandler(throw_idx, multiplier, field) {
@@ -111,7 +106,7 @@ export default class InGameScreen extends React.Component {
           corrHandler={this.corrHandler.bind(this)}
         />
         <View style={styles.bottomBar}>
-          <ConnectedComponent connected={this.state.connected} />
+          <ConnectedComponent />
         </View>
       </View>
     );

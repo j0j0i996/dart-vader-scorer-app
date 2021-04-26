@@ -5,7 +5,7 @@ import axios from "axios";
 export async function findServer(port, ipBase, timeout) {
   success = false;
   var i = 0;
-  var address;
+  var address, name;
   while (success == false && i <= 255) {
     address = "http://" + ipBase + i + ":" + port;
     let service = axios.create({
@@ -22,6 +22,7 @@ export async function findServer(port, ipBase, timeout) {
           if (res.data == "DartBoard") {
             console.log(address + " success");
             success = true;
+            name = "DartBoard";
           }
         }
       });
@@ -30,5 +31,6 @@ export async function findServer(port, ipBase, timeout) {
   return {
     success: success,
     address: address,
+    name: name,
   };
 }

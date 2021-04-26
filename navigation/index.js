@@ -10,7 +10,7 @@ export default function Navigation(props) {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Root" component={BottomTabNavigator} />
+        <Stack.Screen name="root" component={BottomTabNavigator} />
         <Stack.Screen
           name="NotFound"
           component={NotFoundScreen}

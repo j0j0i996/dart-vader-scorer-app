@@ -37,7 +37,7 @@ export default function SettingsScreen({ navigation }) {
   async function onFindBoard() {
     setFindingBoard(true);
     try {
-      var res = await findServer(3000, "192.168.0.", 40);
+      var res = await findServer(3000, "192.168.0.", 70);
     } catch (e) {
       console.log(e);
     }

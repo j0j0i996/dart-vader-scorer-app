@@ -13,10 +13,12 @@ const BottomTab = createBottomTabNavigator();
 export default function BottomTabNavigator() {
   return (
     <BottomTab.Navigator
+      initialRouteName="Game"
       tabBarOptions={{
         activeTintColor: colors.secondary,
         inactiveTintColor: colors.primary,
         keyboardHidesTabBar: true,
+        style: { paddingHorizontal: 50 },
       }}
     >
       <BottomTab.Screen

@@ -21,6 +21,7 @@ export default function SettingsScreen({ navigation }) {
 
   useEffect(() => {
     fetchIP();
+    fetchName();
   });
 
   const fetchIP = async () => {
